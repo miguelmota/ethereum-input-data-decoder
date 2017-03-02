@@ -1,6 +1,6 @@
 {
   "name": "ethereum-input-data-decoder",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Ethereum smart contract transaction input data decoder",
   "main": "index.js",
   "scripts": {
@@ -19,6 +19,13 @@
   "dependencies": {
     "ethereumjs-abi": "^0.6.4"
   },
+  "keywords": [
+    "ethereum",
+    "decoder",
+    "abi",
+    "smart",
+    "contracts"
+  ],
   "devDependencies": {
     "tape": "^4.6.3"
   }
