@@ -6,7 +6,7 @@
   "scripts": {
     "test": "tape ./test/index.js"
   },
- "repository": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/miguelmota/ethereum-input-data-decoder"
   },
@@ -18,5 +18,8 @@
   "license": "MIT",
   "dependencies": {
     "ethereumjs-abi": "^0.6.4"
+  },
+  "devDependencies": {
+    "tape": "^4.6.3"
   }
 }
