@@ -6,7 +6,15 @@
   "scripts": {
     "test": "tape ./test/index.js"
   },
-  "author": "",
+ "repository": {
+    "type": "git",
+    "url": "https://github.com/miguelmota/ethereum-input-data-decoder"
+  },
+  "bugs": {
+    "url": "https://github.com/miguelmota/ethereum-input-data-decoder/issues"
+  },
+  "homepage": "https://github.com/miguelmota/ethereum-input-data-decoder",
+  "author": "Miguel Mota <hello@miguelmota.com> (http://www.miguelmota.com/)",
   "license": "MIT",
   "dependencies": {
     "ethereumjs-abi": "^0.6.4"
