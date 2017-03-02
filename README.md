@@ -12,7 +12,7 @@ npm install ethereum-input-data-decoder
 
 ## Usage
 
-Pass ABI file path to decoder constructor:
+Pass [ABI](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI) file path to decoder constructor:
 
 ```javascript
 const InputDataDecoder = require('ethereum-input-data-decoder');
@@ -26,7 +26,7 @@ const abi = JSON.parse(fs.readFileSync(`${__dirname}/abi.json`));
 const decoder = new InputDataDecoder(abi);
 ```
 
-(Here's an [example abi](./test/abi.json).)
+[example abi](./test/abi.json)
 
 Then you can decode input data:
 
