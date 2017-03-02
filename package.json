@@ -1,0 +1,14 @@
+{
+  "name": "ethereum-input-data-decoder",
+  "version": "0.0.1",
+  "description": "Ethereum smart contract transaction input data decoder",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape ./test/index.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ethereumjs-abi": "^0.6.4"
+  }
+}
