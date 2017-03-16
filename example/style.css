@@ -1,0 +1,7 @@
+.column {
+  display: inline-block;
+}
+
+.column label {
+  display: block;
+}
