@@ -62,6 +62,15 @@ console.log(result);
 }
 ```
 
+Example using input response from [web3.getTransaction](https://github.com/ethereum/wiki/wiki/JavaScript-API#web3ethgettransaction):
+
+```javascript
+web3.eth.getTransaction(txHash, (error, txResult) => {
+  const result = decoder.decodeData(txResult.input);
+  console.log(result);
+});
+```
+
 ## Test
 
 ```bash
