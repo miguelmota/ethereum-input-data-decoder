@@ -6501,8 +6501,9 @@ function decode() {
 
   dataInput.value = data
 
-  console.log(data)
   const result = decoder.decodeData(data);
+
+  console.log(result)
 
   try {
     output.value = JSON.stringify(result, null, 2);
