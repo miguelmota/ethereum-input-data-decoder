@@ -5,6 +5,8 @@ const dataInput = document.querySelector('#dataInput');
 const output = document.querySelector('#output');
 
 function decode() {
+  output.value = ''
+
   const abi = JSON.parse(abiInput.value.trim());
   const decoder = new InputDataDecoder(abi);
 
@@ -14,9 +16,13 @@ function decode() {
 
   dataInput.value = data
 
+  console.log(data)
   const result = decoder.decodeData(data);
 
-  output.value = JSON.stringify(result, null, 2);
+  try {
+    output.value = JSON.stringify(result, null, 2);
+  } catch(error) {
+  }
 }
 
 document.querySelector('#decode')
