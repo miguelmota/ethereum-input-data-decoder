@@ -7,11 +7,15 @@ const output = document.querySelector('#output');
 function decode() {
   const abi = JSON.parse(abiInput.value.trim());
   const decoder = new InputDataDecoder(abi);
-  const data = dataInput.value.trim().replace(/\[\d+\]:(.*)\n?/gmi,'$1')
+
+  // if copied and pasted from etherscan only get data we need
+  const data = dataInput.value.trim()
+  .replace(/(?:[\s\S]*MethodID: (.*)[\s\S])?[\s\S]?\[\d\]:(.*)/gi, '$1$2')
 
   dataInput.value = data
 
   const result = decoder.decodeData(data);
+
   output.value = JSON.stringify(result, null, 2);
 }
 
