@@ -25,7 +25,7 @@ class InputDataDecoder {
 
     const result = this.abi.reduce((acc, obj) => {
       const name = obj.name;
-      const types = obj.inputs.map(x => x.type);
+      const types = obj.inputs ? obj.inputs.map(x => x.type) : [];
       const hash = ethabi.methodID(name, types).toString(`hex`);
 
       if (hash === methodId) {

@@ -6490,9 +6490,12 @@ const dataInput = document.querySelector('#dataInput');
 const output = document.querySelector('#output');
 
 function decode() {
-  const abi = JSON.parse(abiInput.textContent.trim());
+  const abi = JSON.parse(abiInput.value.trim());
   const decoder = new InputDataDecoder(abi);
-  const data = dataInput.textContent.trim();
+  const data = dataInput.value.trim().replace(/\[\d+\]:(.*)\n?/gmi,'$1')
+
+  dataInput.value = data
+
   const result = decoder.decodeData(data);
   output.value = JSON.stringify(result, null, 2);
 }
@@ -6534,7 +6537,7 @@ class InputDataDecoder {
 
     const result = this.abi.reduce((acc, obj) => {
       const name = obj.name;
-      const types = obj.inputs.map(x => x.type);
+      const types = obj.inputs ? obj.inputs.map(x => x.type) : [];
       const hash = ethabi.methodID(name, types).toString(`hex`);
 
       if (hash === methodId) {

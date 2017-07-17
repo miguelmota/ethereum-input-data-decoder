@@ -7,9 +7,9 @@ const output = document.querySelector('#output');
 function decode() {
   const abi = JSON.parse(abiInput.value.trim());
   const decoder = new InputDataDecoder(abi);
-  var data = dataInput.value.trim();
+  const data = dataInput.value.trim().replace(/\[\d+\]:(.*)\n?/gmi,'$1')
 
-  data = data.replace(/\[\d\]:(.*)\n/gi,'$1')
+  dataInput.value = data
 
   const result = decoder.decodeData(data);
   output.value = JSON.stringify(result, null, 2);
