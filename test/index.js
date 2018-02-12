@@ -4,7 +4,7 @@ const InputDataDecoder = require('../index');
 
 /*
  * Example input data from this transaction
- * https://etherscan.io/tx/0xa6f019f2fc916bd8df607f1c99148ebb06322999ff08bc88927fe8406acae1b2)
+ * https://etherscan.io/tx/0xa6f019f2fc916bd8df607f1c99148ebb06322999ff08bc88927fe8406acae1b2
  */
 
 test('decoder', t => {
@@ -50,4 +50,18 @@ test('decoder', t => {
     t.equal(result.inputs[3], `BTC`);
     t.end();
   });
+
+  // https://etherscan.io/tx/0xc7add41f6ae5e4fe268f654709f450983510ab7da67812be608faf2133a90b5a
+  // TODO: figure this out
+  t.test(`TODO: contract creation data`, t => {
+    t.plan(1);
+
+    const abi = JSON.parse(fs.readFileSync(`${__dirname}/abi.json`));
+    const decoder = new InputDataDecoder(abi);
+
+    const data = fs.readFileSync(`${__dirname}/contract_creation_data.txt`)
+    const result = decoder.decodeData(data);
+
+    t.ok(true)
+  })
 });
