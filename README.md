@@ -77,6 +77,20 @@ web3.eth.getTransaction(txHash, (error, txResult) => {
 npm test
 ```
 
+## FAQ
+
+- Q: How can I retrieve the ABI?
+
+  - A: You can generate the ABI from the solidity source files using the [Solidity Compiler](http://solidity.readthedocs.io/en/develop/installing-solidity.html).
+
+    ```bash
+    solc --abi MyContract.sol -o build
+    ```
+
+- Q: How do I decode contract creation input data?
+
+  - A: Currently this isn't supported but happy to merge in PRs if there's a good solution.
+
 ## License
 
 MIT
