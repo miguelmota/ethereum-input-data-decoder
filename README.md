@@ -89,7 +89,7 @@ npm test
 
 - Q: How do I decode contract creation input data?
 
-  - A: Currently this isn't supported but happy to merge in PRs if there's a good solution.
+  - A: Currently this isn't supported but happy to merge in a PR if there's a good solution.
 
 ## License
 
