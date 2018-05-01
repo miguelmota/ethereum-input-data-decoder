@@ -87,9 +87,9 @@ npm test
     solc --abi MyContract.sol -o build
     ```
 
-- Q: How do I decode contract creation input data?
+- Q: Can this library decode contract creation input data?
 
-  - A: Currently this isn't supported but happy to merge in a PR if there's a good solution.
+  - A: Yes, it can decode contract creation input data.
 
 ## License
 

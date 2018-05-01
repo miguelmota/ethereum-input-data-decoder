@@ -52,16 +52,16 @@ test('decoder', t => {
   });
 
   // https://etherscan.io/tx/0xc7add41f6ae5e4fe268f654709f450983510ab7da67812be608faf2133a90b5a
-  // TODO: figure this out
-  t.test(`TODO: contract creation data`, t => {
-    t.plan(1);
+  t.test(`contract creation data`, t => {
+    t.plan(2);
 
     const abi = JSON.parse(fs.readFileSync(`${__dirname}/abi.json`));
     const decoder = new InputDataDecoder(abi);
 
     const data = fs.readFileSync(`${__dirname}/contract_creation_data.txt`)
-    const result = decoder.decodeData(data);
+    const result = decoder.decodeData(data)
 
-    t.ok(true)
+    t.equal(result.inputs[0].toString(16), `0xB2Cb826C945D8Df01802b5cf3c4105685D4933A0`)
+    t.equal(result.inputs[1].toString(16), `STIFTUNG Dfinity FDC`)
   })
-});
+})
