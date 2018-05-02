@@ -1,8 +1,12 @@
-# Ethereum input data decoder
+<h1 align="center">
+  <br />
+  <img src="https://user-images.githubusercontent.com/168240/39537094-61c30484-4ded-11e8-8c93-410ba0510cf4.png" alt="Ethereum input data decoder" width="750" />
+  <br />
+  <br />
+  <br />
+</h1>
 
 > Ethereum smart contract transaction input data decoder
-
-Uses [ethereumjs-abi](https://github.com/ethereumjs/ethereumjs-abi) for decoding.
 
 ## Demo
 
