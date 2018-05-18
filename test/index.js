@@ -1,6 +1,6 @@
 const fs = require('fs');
 const test = require('tape');
-const InputDataDecoder = require('../index');
+const InputDataDecoder = require('../');
 
 /*
  * Example input data from this transaction
