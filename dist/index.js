@@ -109,7 +109,10 @@ var InputDataDecoder = function () {
 
       if (!result.name) {
         try {
-          return this.decodeConstructor(data);
+          var decoded = this.decodeConstructor(data);
+          if (decoded) {
+            return decoded;
+          }
         } catch (err) {}
       }
 

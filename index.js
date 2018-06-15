@@ -94,7 +94,10 @@ class InputDataDecoder {
 
     if (!result.name) {
       try {
-        return this.decodeConstructor(data)
+        const decoded = this.decodeConstructor(data)
+        if (decoded) {
+          return decoded
+        }
       } catch(err) { }
     }
 
