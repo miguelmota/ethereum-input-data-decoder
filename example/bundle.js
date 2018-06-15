@@ -110,7 +110,7 @@ class InputDataDecoder {
 
     const dataBuf = new Buffer(data.replace(/^0x/, ``), `hex`)
     const methodId = dataBuf.slice(0, 4).toString(`hex`)
-    const inputsBuf = dataBuf.slice(4)
+    var inputsBuf = dataBuf.slice(4)
 
     const result = this.abi.reduce((acc, obj) => {
       if (obj.type === 'constructor') return acc
@@ -119,7 +119,12 @@ class InputDataDecoder {
       const hash = ethabi.methodID(name, types).toString(`hex`)
 
       if (hash === methodId) {
-        const inputs = ethabi.rawDecode(types, inputsBuf, [])
+        // https://github.com/miguelmota/ethereum-input-data-decoder/issues/8
+        if (methodId === 'a9059cbb') {
+          inputsBuf = Buffer.concat([new Buffer(12), inputsBuf.slice(12,32), inputsBuf.slice(32)])
+        }
+
+        const inputs = ethabi.rawDecode(types, inputsBuf)
 
         return {
           name,
