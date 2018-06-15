@@ -95,7 +95,12 @@ var InputDataDecoder = function () {
         var hash = ethabi.methodID(name, types).toString('hex');
 
         if (hash === methodId) {
-          var inputs = ethabi.rawDecode(types, inputsBuf, []);
+          // https://github.com/miguelmota/ethereum-input-data-decoder/issues/8
+          if (methodId === 'a9059cbb') {
+            inputsBuf = Buffer.concat([new Buffer(12), inputsBuf.slice(12, 32), inputsBuf.slice(32)]);
+          }
+
+          var inputs = ethabi.rawDecode(types, inputsBuf);
 
           return {
             name: name,

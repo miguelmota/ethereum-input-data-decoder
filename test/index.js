@@ -65,3 +65,15 @@ test('decoder', t => {
     t.equal(result.inputs[1].toString(16), `STIFTUNG Dfinity FDC`)
   })
 })
+
+// https://github.com/miguelmota/ethereum-input-data-decoder/issues/8
+test('256 address', t => {
+  t.plan(2)
+  const decoder = new InputDataDecoder(`${__dirname}/abi2.json`)
+
+  const data = '0xa9059cbb85f1150654584d0192059454e9dc1532d9d9cf914926406a02370cea80cf32f600000000000000000000000000000000000000000000000000000000033dc10b'
+
+  const result = decoder.decodeData(data);
+  t.equal(result.inputs[0].toString(16), 'e9dc1532d9d9cf914926406a02370cea80cf32f6')
+  t.equal(result.inputs[1].toString(10), '54378763')
+})
