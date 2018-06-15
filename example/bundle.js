@@ -108,15 +108,12 @@ class InputDataDecoder {
 
     data = data.trim()
 
-    try {
-      return this.decodeConstructor(data)
-    } catch(err) { }
-
     const dataBuf = new Buffer(data.replace(/^0x/, ``), `hex`)
     const methodId = dataBuf.slice(0, 4).toString(`hex`)
     const inputsBuf = dataBuf.slice(4)
 
     const result = this.abi.reduce((acc, obj) => {
+      if (obj.type === 'constructor') return acc
       const name = obj.name
       const types = obj.inputs ? obj.inputs.map(x => x.type) : []
       const hash = ethabi.methodID(name, types).toString(`hex`)
@@ -133,6 +130,15 @@ class InputDataDecoder {
 
       return acc
     }, {})
+
+    if (!result.name) {
+      try {
+        const decoded = this.decodeConstructor(data)
+        if (decoded) {
+          return decoded
+        }
+      } catch(err) { }
+    }
 
     return result
   }
