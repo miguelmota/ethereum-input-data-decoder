@@ -82,15 +82,12 @@ var InputDataDecoder = function () {
 
       data = data.trim();
 
-      try {
-        return this.decodeConstructor(data);
-      } catch (err) {}
-
       var dataBuf = new Buffer(data.replace(/^0x/, ''), 'hex');
       var methodId = dataBuf.slice(0, 4).toString('hex');
       var inputsBuf = dataBuf.slice(4);
 
       var result = this.abi.reduce(function (acc, obj) {
+        if (obj.type === 'constructor') return acc;
         var name = obj.name;
         var types = obj.inputs ? obj.inputs.map(function (x) {
           return x.type;
@@ -109,6 +106,12 @@ var InputDataDecoder = function () {
 
         return acc;
       }, {});
+
+      if (!result.name) {
+        try {
+          return this.decodeConstructor(data);
+        } catch (err) {}
+      }
 
       return result;
     }
