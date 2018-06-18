@@ -42,7 +42,7 @@ var InputDataDecoder = function () {
           continue;
         }
 
-        var name = obj.name;
+        var name = obj.name || null;
         var types = obj.inputs ? obj.inputs.map(function (x) {
           return x.type;
         }) : [];
@@ -88,7 +88,7 @@ var InputDataDecoder = function () {
 
       var result = this.abi.reduce(function (acc, obj) {
         if (obj.type === 'constructor') return acc;
-        var name = obj.name;
+        var name = obj.name || null;
         var types = obj.inputs ? obj.inputs.map(function (x) {
           return x.type;
         }) : [];
@@ -110,7 +110,7 @@ var InputDataDecoder = function () {
         }
 
         return acc;
-      }, {});
+      }, { name: null, types: [], inputs: [] });
 
       if (!result.name) {
         try {

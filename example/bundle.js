@@ -71,7 +71,7 @@ class InputDataDecoder {
         continue
       }
 
-      const name = obj.name
+      const name = obj.name || null
       const types = obj.inputs ? obj.inputs.map(x => x.type) : []
 
       // take last 32 bytes
@@ -114,7 +114,7 @@ class InputDataDecoder {
 
     const result = this.abi.reduce((acc, obj) => {
       if (obj.type === 'constructor') return acc
-      const name = obj.name
+      const name = obj.name || null
       const types = obj.inputs ? obj.inputs.map(x => x.type) : []
       const hash = ethabi.methodID(name, types).toString(`hex`)
 
@@ -134,7 +134,7 @@ class InputDataDecoder {
       }
 
       return acc
-    }, {})
+    }, {name: null, types: [], inputs: []})
 
     if (!result.name) {
       try {
