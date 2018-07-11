@@ -30,7 +30,7 @@ const decoder = new InputDataDecoder(`${__dirname}/abi.json`);
 Alternatively, you can pass ABI array object to constructor;
 
 ```javascript
-const abi = JSON.parse(fs.readFileSync(`${__dirname}/abi.json`));
+const abi = JSON.parse(jsonAsStringOrObject);
 const decoder = new InputDataDecoder(abi);
 ```
 
@@ -73,6 +73,24 @@ web3.eth.getTransaction(txHash, (error, txResult) => {
   const result = decoder.decodeData(txResult.input);
   console.log(result);
 });
+```
+
+### Decoding Big Numbers
+
+```javascript
+var BN = require("bn.js")
+
+var n = new BN("55")
+console.log(n.toString(10)) // "5"
+console.log(n.toNumber()) // 55
+```
+
+Please keep in mind that JavaScript only supports numbers up to 64 bits. Solidity numbers can be up to 256 bits, so you run the risk of truncation when casting or having the big number library error out
+
+```javascript
+var n = new BN("543534254523452352345234523455")
+console.log(n.toString(10)) // "543534254523452352345234523455"
+console.log(n.toNumber()) // ERROR!
 ```
 
 ## Test
