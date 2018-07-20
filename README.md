@@ -30,7 +30,7 @@ const decoder = new InputDataDecoder(`${__dirname}/abi.json`);
 Alternatively, you can pass ABI array object to constructor;
 
 ```javascript
-const abi = JSON.parse(jsonAsStringOrObject);
+const abi = [{ ... }]
 const decoder = new InputDataDecoder(abi);
 ```
 
@@ -77,18 +77,19 @@ web3.eth.getTransaction(txHash, (error, txResult) => {
 
 ### Decoding Big Numbers
 
-```javascript
-var BN = require("bn.js")
+All numbers are returned in [big number](https://github.com/indutny/bn.js) format to preserve precision.
 
-var n = new BN("55")
-console.log(n.toString(10)) // "5"
-console.log(n.toNumber()) // 55
+Here's an example of how to convert the big number to a human readable format.
+
+```js
+console.log(result.inputs[0].toString(10)) // "5"
+console.log(result.inputs[0].toNumber()) // 55
 ```
 
-Please keep in mind that JavaScript only supports numbers up to 64 bits. Solidity numbers can be up to 256 bits, so you run the risk of truncation when casting or having the big number library error out
+Please keep in mind that JavaScript only supports numbers up to 64 bits. Solidity numbers can be up to 256 bits, so you run the risk of truncation when casting or having the big number library error out when trying to parse a large number to a JavaScript Number type.
 
-```javascript
-var n = new BN("543534254523452352345234523455")
+```js
+const n = new BN("543534254523452352345234523455")
 console.log(n.toString(10)) // "543534254523452352345234523455"
 console.log(n.toNumber()) // ERROR!
 ```
