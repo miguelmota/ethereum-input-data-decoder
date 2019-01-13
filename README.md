@@ -100,6 +100,36 @@ console.log(n.toNumber()) // ERROR!
 npm test
 ```
 
+## Development
+
+1. Clone repository:
+
+  ```bash
+  git clone git@github.com:miguelmota/ethereum-input-data-decoder.git
+
+  cd ethereum-input-data-decoder/
+  ```
+
+2. Install dependencies:
+
+  ```bash
+  npm install
+  ```
+
+3. Make changes.
+
+4. Run tests:
+
+  ```bash
+  npm test
+  ```
+
+5. Run linter:
+
+  ```bash
+  npm run lint:fix
+  ```
+
 ## FAQ
 
 - Q: How can I retrieve the ABI?

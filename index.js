@@ -3,7 +3,7 @@ const ethabi = require('ethereumjs-abi')
 const ethers = require('ethers')
 
 class InputDataDecoder {
-  constructor(prop) {
+  constructor (prop) {
     this.abi = []
 
     if (typeof prop === `string`) {
@@ -15,19 +15,20 @@ class InputDataDecoder {
     }
   }
 
-  decodeConstructor(data) {
+  decodeConstructor (data) {
     if (Buffer.isBuffer(data)) {
       data = data.toString('utf8')
     }
 
-    if (typeof data !== `string`) {
-      data = ``
+    if (typeof data !== 'string') {
+      data = ''
     }
 
     data = data.trim()
 
     for (var i = 0; i < this.abi.length; i++) {
       const obj = this.abi[i]
+
       if (obj.type !== 'constructor') {
         continue
       }
@@ -42,7 +43,7 @@ class InputDataDecoder {
         throw new Error('fial')
       }
 
-      if (data.indexOf(`0x`) !== 0) {
+      if (data.indexOf('0x') !== 0) {
         data = `0x${data}`
       }
 
@@ -58,31 +59,31 @@ class InputDataDecoder {
     throw new Error('not found')
   }
 
-  decodeData(data) {
+  decodeData (data) {
     if (Buffer.isBuffer(data)) {
       data = data.toString('utf8')
     }
 
-    if (typeof data !== `string`) {
-      data = ``
+    if (typeof data !== 'string') {
+      data = ''
     }
 
     data = data.trim()
 
-    const dataBuf = new Buffer(data.replace(/^0x/, ``), `hex`)
-    const methodId = dataBuf.slice(0, 4).toString(`hex`)
+    const dataBuf = Buffer.from(data.replace(/^0x/, ''), 'hex')
+    const methodId = dataBuf.slice(0, 4).toString('hex')
     var inputsBuf = dataBuf.slice(4)
 
     const result = this.abi.reduce((acc, obj) => {
       if (obj.type === 'constructor') return acc
       const name = obj.name || null
       const types = obj.inputs ? obj.inputs.map(x => x.type) : []
-      const hash = ethabi.methodID(name, types).toString(`hex`)
+      const hash = ethabi.methodID(name, types).toString('hex')
 
       if (hash === methodId) {
-        // https://github.com/miguelmota/ethereum-input-data-decoder/issues/8
+        // NOTE: https://github.com/miguelmota/ethereum-input-data-decoder/issues/8
         if (methodId === 'a9059cbb') {
-          inputsBuf = Buffer.concat([new Buffer(12), inputsBuf.slice(12,32), inputsBuf.slice(32)])
+          inputsBuf = Buffer.concat([new Buffer(12), inputsBuf.slice(12, 32), inputsBuf.slice(32)])
         }
 
         const inputs = ethabi.rawDecode(types, inputsBuf)
@@ -95,7 +96,7 @@ class InputDataDecoder {
       }
 
       return acc
-    }, {name: null, types: [], inputs: []})
+    }, { name: null, types: [], inputs: [] })
 
     if (!result.name) {
       try {
@@ -103,7 +104,7 @@ class InputDataDecoder {
         if (decoded) {
           return decoded
         }
-      } catch(err) { }
+      } catch (err) { }
     }
 
     return result
