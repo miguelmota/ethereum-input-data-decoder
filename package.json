@@ -1,6 +1,6 @@
 {
   "name": "ethereum-input-data-decoder",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Ethereum smart contract transaction input data decoder",
   "main": "dist/index.js",
   "scripts": {
@@ -25,7 +25,7 @@
   },
   "license": {
     "type": "MIT",
-    "url": "https://github.com/miguelmota/ethereum-input-data-decoder/blob/master/LICENSE.md"
+    "url": "https://github.com/miguelmota/ethereum-input-data-decoder/blob/master/LICENSE"
   },
   "dependencies": {
     "ethereumjs-abi": "^0.6.4",

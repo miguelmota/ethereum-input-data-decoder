@@ -1,12 +1,16 @@
-<h1 align="center">
+<h3 align="center">
   <br />
-  <img src="https://user-images.githubusercontent.com/168240/39537094-61c30484-4ded-11e8-8c93-410ba0510cf4.png" alt="Ethereum input data decoder" width="750" />
+  <img src="https://user-images.githubusercontent.com/168240/39537094-61c30484-4ded-11e8-8c93-410ba0510cf4.png" alt="logo" width="750" />
   <br />
   <br />
   <br />
-</h1>
+</h3>
+
+# ethereum-input-data-decoder
 
 > Ethereum smart contract transaction input data decoder
+
+[![License](http://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/miguelmota/ethereum-input-data-decoder/master/LICENSE) [![Build Status](https://travis-ci.org/miguelmota/ethereum-input-data-decoder.svg?branch=master)](https://travis-ci.org/miguelmota/ethereum-input-data-decoder) [![dependencies Status](https://david-dm.org/miguelmota/ethereum-input-data-decoder/status.svg)](https://david-dm.org/miguelmota/ethereum-input-data-decoder) [![NPM version](https://badge.fury.io/js/ethereum-input-data-decoder.svg)](http://badge.fury.io/js/ethereum-input-data-decoder)
 
 ## Demo
 
@@ -18,7 +22,7 @@
 npm install ethereum-input-data-decoder
 ```
 
-## Usage
+## Getting started
 
 Pass [ABI](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI) file path to decoder constructor:
 
@@ -146,4 +150,4 @@ npm test
 
 ## License
 
-MIT
+[MIT](LICENSE)
