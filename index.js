@@ -71,8 +71,8 @@ class InputDataDecoder {
     data = data.trim()
 
     const dataBuf = Buffer.from(data.replace(/^0x/, ''), 'hex')
-    const methodId = dataBuf.slice(0, 4).toString('hex')
-    var inputsBuf = dataBuf.slice(4)
+    const methodId = dataBuf.subarray(0, 4).toString('hex')
+    var inputsBuf = dataBuf.subarray(4)
 
     const result = this.abi.reduce((acc, obj) => {
       if (obj.type === 'constructor') return acc
@@ -81,11 +81,7 @@ class InputDataDecoder {
       const hash = ethabi.methodID(name, types).toString('hex')
 
       if (hash === methodId) {
-        // NOTE: https://github.com/miguelmota/ethereum-input-data-decoder/issues/8
-        if (methodId === 'a9059cbb') {
-          inputsBuf = Buffer.concat([new Buffer(12), inputsBuf.slice(12, 32), inputsBuf.slice(32)])
-        }
-
+        inputsBuf = normalizeAddresses(types, inputsBuf)
         const inputs = ethabi.rawDecode(types, inputsBuf)
 
         return {
@@ -109,6 +105,41 @@ class InputDataDecoder {
 
     return result
   }
+}
+
+function normalizeAddresses (types, input) {
+  let offset = 0
+  for (let i = 0; i < types.length; i++) {
+    const type = types[i]
+    if (type === 'address') {
+      input.set(new Buffer(12), offset)
+    }
+
+    if (isArray(type)) {
+      const size = parseTypeArray(type)
+      if (size && size !== 'dynamic') {
+        offset += 32 * size
+      } else {
+        offset += 32
+      }
+    } else {
+      offset += 32
+    }
+  }
+
+  return input
+}
+
+function parseTypeArray (type) {
+  const tmp = type.match(/(.*)\[(.*?)\]$/)
+  if (tmp) {
+    return tmp[2] === '' ? 'dynamic' : parseInt(tmp[2], 10)
+  }
+  return null
+}
+
+function isArray (type) {
+  return type.lastIndexOf(']') === type.length - 1
 }
 
 module.exports = InputDataDecoder

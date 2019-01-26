@@ -1,11 +1,9 @@
 const fs = require('fs')
 const test = require('tape')
-const InputDataDecoder = require('../')
-
-// NOTE: Example input data from this transaction
-//  https://etherscan.io/tx/0xa6f019f2fc916bd8df607f1c99148ebb06322999ff08bc88927fe8406acae1b2
+const InputDataDecoder = require('../index')
 
 test('decoder', t => {
+  // https://etherscan.io/tx/0xa6f019f2fc916bd8df607f1c99148ebb06322999ff08bc88927fe8406acae1b2
   const data = '0x67043cae0000000000000000000000005a9dac9315fdd1c3d13ef8af7fdfeb522db08f020000000000000000000000000000000000000000000000000000000058a20230000000000000000000000000000000000000000000000000000000000040293400000000000000000000000000000000000000000000000000000000000000a0f3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c800000000000000000000000000000000000000000000000000000000000000034254430000000000000000000000000000000000000000000000000000000000'
 
   t.test('abi filepath', t => {
@@ -61,6 +59,21 @@ test('decoder', t => {
 
     t.equal(result.inputs[0].toString(16), '0xB2Cb826C945D8Df01802b5cf3c4105685D4933A0')
     t.equal(result.inputs[1].toString(16), 'STIFTUNG Dfinity FDC')
+  })
+
+  // https://etherscan.io/tx/0x94fadf5f5c7805b8ceb8a13a0a7fbce06054ff08cdfdc2fd555a7902592aebe6
+  t.test('erc721 transferFrom', t => {
+    t.plan(3)
+
+    const abi = JSON.parse(fs.readFileSync(`${__dirname}/data/erc721_abi.json`))
+    const decoder = new InputDataDecoder(abi)
+
+    const data = fs.readFileSync(`${__dirname}/data/erc71_transferfrom_tx_data.txt`)
+    const result = decoder.decodeData(data)
+
+    t.equal(result.inputs[0].toString(16), '10017ca37b1257ac0771e24652aa28c758e378eb')
+    t.equal(result.inputs[1].toString(16), 'e7a632d89104385bdd3992eeb82cffeb48e4e539')
+    t.equal(result.inputs[2].toString(16), '5dc5')
   })
 })
 

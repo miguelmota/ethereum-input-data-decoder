@@ -38,6 +38,7 @@ var InputDataDecoder = function () {
 
       for (var i = 0; i < this.abi.length; i++) {
         var obj = this.abi[i];
+
         if (obj.type !== 'constructor') {
           continue;
         }
@@ -82,9 +83,9 @@ var InputDataDecoder = function () {
 
       data = data.trim();
 
-      var dataBuf = new Buffer(data.replace(/^0x/, ''), 'hex');
-      var methodId = dataBuf.slice(0, 4).toString('hex');
-      var inputsBuf = dataBuf.slice(4);
+      var dataBuf = Buffer.from(data.replace(/^0x/, ''), 'hex');
+      var methodId = dataBuf.subarray(0, 4).toString('hex');
+      var inputsBuf = dataBuf.subarray(4);
 
       var result = this.abi.reduce(function (acc, obj) {
         if (obj.type === 'constructor') return acc;
@@ -95,11 +96,7 @@ var InputDataDecoder = function () {
         var hash = ethabi.methodID(name, types).toString('hex');
 
         if (hash === methodId) {
-          // https://github.com/miguelmota/ethereum-input-data-decoder/issues/8
-          if (methodId === 'a9059cbb') {
-            inputsBuf = Buffer.concat([new Buffer(12), inputsBuf.slice(12, 32), inputsBuf.slice(32)]);
-          }
-
+          inputsBuf = normalizeAddresses(types, inputsBuf);
           var inputs = ethabi.rawDecode(types, inputsBuf);
 
           return {
@@ -127,5 +124,40 @@ var InputDataDecoder = function () {
 
   return InputDataDecoder;
 }();
+
+function normalizeAddresses(types, input) {
+  var offset = 0;
+  for (var i = 0; i < types.length; i++) {
+    var type = types[i];
+    if (type === 'address') {
+      input.set(new Buffer(12), offset);
+    }
+
+    if (isArray(type)) {
+      var size = parseTypeArray(type);
+      if (size && size !== 'dynamic') {
+        offset += 32 * size;
+      } else {
+        offset += 32;
+      }
+    } else {
+      offset += 32;
+    }
+  }
+
+  return input;
+}
+
+function parseTypeArray(type) {
+  var tmp = type.match(/(.*)\[(.*?)\]$/);
+  if (tmp) {
+    return tmp[2] === '' ? 'dynamic' : parseInt(tmp[2], 10);
+  }
+  return null;
+}
+
+function isArray(type) {
+  return type.lastIndexOf(']') === type.length - 1;
+}
 
 module.exports = InputDataDecoder;

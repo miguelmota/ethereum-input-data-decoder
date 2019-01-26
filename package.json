@@ -1,6 +1,6 @@
 {
   "name": "ethereum-input-data-decoder",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Ethereum smart contract transaction input data decoder",
   "main": "dist/index.js",
   "scripts": {
@@ -8,7 +8,8 @@
     "client": "browserify ./example/main.js -o ./example/bundle.js",
     "build": "babel index.js --presets babel-preset-es2015 --out-dir dist/",
     "lint": "standard index.js test/*.js",
-    "lint:fix": "standard --fix index.js test/*.js"
+    "lint:fix": "standard --fix index.js test/*.js",
+    "prepublishOnly": "npm run lint:fix && npm run build"
   },
   "repository": {
     "type": "git",
