@@ -1,7 +1,28 @@
+.container {
+  display: flex;
+  min-width: 728px;
+  width: 100%;
+  height: 100%;
+}
+
 .column {
   display: inline-block;
+  width: 30%;
+  padding: 10px;
 }
 
 .column label {
   display: block;
+}
+
+.actions {
+  height: 20px;
+}
+
+textarea {
+  width: 100%;
+}
+
+button {
+  cursor: pointer;
 }
