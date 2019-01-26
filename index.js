@@ -112,7 +112,7 @@ function normalizeAddresses (types, input) {
   for (let i = 0; i < types.length; i++) {
     const type = types[i]
     if (type === 'address') {
-      input.set(new Buffer(12), offset)
+      input.set(Buffer.alloc(12), offset)
     }
 
     if (isArray(type)) {
