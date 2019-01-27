@@ -98,6 +98,74 @@ console.log(n.toString(10)) // "543534254523452352345234523455"
 console.log(n.toNumber()) // ERROR!
 ```
 
+## CLI
+
+## Install
+
+```bash
+npm install -g ethereum-input-data-decoder
+```
+
+### Usage
+
+```bash
+$ ethereum_input_data_decoder --help
+
+  Ethereum smart contract transaction input data decoder
+
+  Usage
+    $ ethereum_input_data_decoder [flags] [input]
+
+  Options
+    --abi, -a  ABI file path
+    --input, -i Input data file path
+
+  Examples
+    $ ethereum_input_data_decoder --abi token.abi --input data.txt
+    $ ethereum_input_data_decoder --abi token.abi "0x23b872dd..."
+```
+
+### Example
+
+Pass ABI file and input data as file:
+
+```bash
+$ ethereum_input_data_decoder --abi abi.json --input data.tx
+
+name      registerOffChainDonation
+address   0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
+uint256   1487012400
+uint256   4204852
+string    BTC
+bytes32   0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
+```
+
+Pass ABI file and input data as string:
+
+```bash
+$ ethereum_input_data_decoder --abi abi.json 0x67043cae0...000000
+
+name      registerOffChainDonation
+address   0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
+uint256   1487012400
+uint256   4204852
+string    BTC
+bytes32   0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
+```
+
+You can also pipe the input data:
+
+```bash
+$ cat data.txt | ethereum_input_data_decoder --abi abi.json
+
+name      registerOffChainDonation
+address   0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
+uint256   1487012400
+uint256   4204852
+string    BTC
+bytes32   0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
+```
+
 ## Test
 
 ```bash

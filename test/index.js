@@ -4,11 +4,11 @@ const InputDataDecoder = require('../index')
 
 test('decoder', t => {
   // https://etherscan.io/tx/0xa6f019f2fc916bd8df607f1c99148ebb06322999ff08bc88927fe8406acae1b2
-  const data = '0x67043cae0000000000000000000000005a9dac9315fdd1c3d13ef8af7fdfeb522db08f020000000000000000000000000000000000000000000000000000000058a20230000000000000000000000000000000000000000000000000000000000040293400000000000000000000000000000000000000000000000000000000000000a0f3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c800000000000000000000000000000000000000000000000000000000000000034254430000000000000000000000000000000000000000000000000000000000'
+  const data = fs.readFileSync(`${__dirname}/data/abi1_input_data.txt`)
 
   t.test('abi filepath', t => {
     t.plan(6)
-    const decoder = new InputDataDecoder(`${__dirname}/data/abi.json`)
+    const decoder = new InputDataDecoder(`${__dirname}/data/abi1.json`)
 
     const result = decoder.decodeData(data)
     t.equal(result.name, 'registerOffChainDonation')
@@ -28,7 +28,7 @@ test('decoder', t => {
 
   t.test('abi array object', t => {
     t.plan(6)
-    const abi = JSON.parse(fs.readFileSync(`${__dirname}/data/abi.json`))
+    const abi = JSON.parse(fs.readFileSync(`${__dirname}/data/abi1.json`))
     const decoder = new InputDataDecoder(abi)
 
     const result = decoder.decodeData(data)
@@ -51,7 +51,7 @@ test('decoder', t => {
   t.test('contract creation data', t => {
     t.plan(2)
 
-    const abi = JSON.parse(fs.readFileSync(`${__dirname}/data/abi.json`))
+    const abi = JSON.parse(fs.readFileSync(`${__dirname}/data/abi1.json`))
     const decoder = new InputDataDecoder(abi)
 
     const data = fs.readFileSync(`${__dirname}/data/contract_creation_data.txt`)
@@ -68,7 +68,7 @@ test('decoder', t => {
     const abi = JSON.parse(fs.readFileSync(`${__dirname}/data/erc721_abi.json`))
     const decoder = new InputDataDecoder(abi)
 
-    const data = fs.readFileSync(`${__dirname}/data/erc71_transferfrom_tx_data.txt`)
+    const data = fs.readFileSync(`${__dirname}/data/erc721_transferfrom_tx_data.txt`)
     const result = decoder.decodeData(data)
 
     t.equal(result.inputs[0].toString(16), '10017ca37b1257ac0771e24652aa28c758e378eb')
