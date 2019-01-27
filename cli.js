@@ -35,7 +35,7 @@ if (cli.input && cli.input.length > 0) {
 } else if (input) {
   input = fs.readFileSync(path.resolve(input))
   run(abi, input)
-} else if (process.stdin) {
+} else {
   input = ''
   process.stdin.setEncoding('utf8')
   process.stdin.resume()
@@ -47,7 +47,7 @@ if (cli.input && cli.input.length > 0) {
   })
   const t = setTimeout(() => {
     process.exit(0)
-  }, 1e6)
+  }, 1e3)
   process.stdin.on('end', () => {
     clearTimeout(t)
     run(abi, input)
