@@ -36,17 +36,20 @@ if (cli.input && cli.input.length > 0) {
   input = fs.readFileSync(path.resolve(input))
   run(abi, input)
 } else if (process.stdin) {
+  input = ''
   process.stdin.setEncoding('utf8')
   process.stdin.resume()
-  let content = ''
-  process.stdin.on('readable', (buf) => {
+  process.stdin.on('readable', () => {
     let chunk
     while ((chunk = process.stdin.read())) {
-      content += chunk
+      input += chunk.toString()
     }
   })
-  process.stdin.on('end', (buf) => {
-    input = (content || '').trim()
+  const t = setTimeout(() => {
+    process.exit(0)
+  }, 1e6)
+  process.stdin.on('end', () => {
+    clearTimeout(t)
     run(abi, input)
   })
 } else {
