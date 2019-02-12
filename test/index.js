@@ -75,16 +75,32 @@ test('decoder', t => {
     t.equal(result.inputs[1].toString(16), 'e7a632d89104385bdd3992eeb82cffeb48e4e539')
     t.equal(result.inputs[2].toString(16), '5dc5')
   })
-})
 
-// https://github.com/miguelmota/ethereum-input-data-decoder/issues/8
-test('256 address', t => {
-  t.plan(2)
-  const decoder = new InputDataDecoder(`${__dirname}/data/abi2.json`)
+  t.test('abiv2', t => {
+    t.plan(5)
 
-  const data = '0xa9059cbb85f1150654584d0192059454e9dc1532d9d9cf914926406a02370cea80cf32f600000000000000000000000000000000000000000000000000000000033dc10b'
+    const abi = JSON.parse(fs.readFileSync(`${__dirname}/data/abiv2.json`))
+    const decoder = new InputDataDecoder(abi)
 
-  const result = decoder.decodeData(data)
-  t.equal(result.inputs[0].toString(16), 'e9dc1532d9d9cf914926406a02370cea80cf32f6')
-  t.equal(result.inputs[1].toString(10), '54378763')
+    const data = fs.readFileSync(`${__dirname}/data/abiv2_input_data.txt`)
+    const result = decoder.decodeData(data)
+
+    t.equal(result.inputs[0].id.toString(10), '2')
+    t.equal(result.inputs[0].state.toString(10), '2')
+    t.equal(result.inputs[0].valuation.toString(10), '50')
+    t.equal(result.inputs[0].fingerprint.toString(), '0xabcd000000000000000000000000000000000000000000000000000000000000')
+    t.equal(result.inputs[0].countdown.toString(10), '1549925124')
+  })
+
+  // https://github.com/miguelmota/ethereum-input-data-decoder/issues/8
+  t.test('256 address', t => {
+    t.plan(2)
+    const decoder = new InputDataDecoder(`${__dirname}/data/abi2.json`)
+
+    const data = '0xa9059cbb85f1150654584d0192059454e9dc1532d9d9cf914926406a02370cea80cf32f600000000000000000000000000000000000000000000000000000000033dc10b'
+
+    const result = decoder.decodeData(data)
+    t.equal(result.inputs[0].toString(16), 'e9dc1532d9d9cf914926406a02370cea80cf32f6')
+    t.equal(result.inputs[1].toString(10), '54378763')
+  })
 })

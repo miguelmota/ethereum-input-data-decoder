@@ -52,14 +52,19 @@ var InputDataDecoder = function () {
         data = data.slice(-256);
 
         if (data.length !== 256) {
-          throw new Error('fial');
+          throw new Error('fail');
         }
 
         if (data.indexOf('0x') !== 0) {
           data = '0x' + data;
         }
 
+        console.log(obj.inputs);
+        console.log(types);
+        console.log(data);
+
         var inputs = ethers.Interface.decodeParams(types, data);
+        console.log('here', inputs);
 
         return {
           name: name,
@@ -89,6 +94,7 @@ var InputDataDecoder = function () {
 
       var result = this.abi.reduce(function (acc, obj) {
         if (obj.type === 'constructor') return acc;
+        if (obj.type === 'event') return acc;
         var name = obj.name || null;
         var types = obj.inputs ? obj.inputs.map(function (x) {
           return x.type;

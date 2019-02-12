@@ -40,14 +40,14 @@ class InputDataDecoder {
       data = data.slice(-256)
 
       if (data.length !== 256) {
-        throw new Error('fial')
+        throw new Error('fail')
       }
 
       if (data.indexOf('0x') !== 0) {
         data = `0x${data}`
       }
 
-      const inputs = ethers.Interface.decodeParams(types, data)
+      const inputs = ethers.utils.defaultAbiCoder.decode(types, data)
 
       return {
         name,
@@ -76,13 +76,30 @@ class InputDataDecoder {
 
     const result = this.abi.reduce((acc, obj) => {
       if (obj.type === 'constructor') return acc
+      if (obj.type === 'event') return acc
       const name = obj.name || null
-      const types = obj.inputs ? obj.inputs.map(x => x.type) : []
-      const hash = ethabi.methodID(name, types).toString('hex')
+      let types = obj.inputs ? obj.inputs.map(x => {
+        if (x.type === 'tuple[]') {
+          return x
+        } else {
+          return x.type
+        }
+      }) : []
+
+      const hash = genMethodId(name, types)
 
       if (hash === methodId) {
-        inputsBuf = normalizeAddresses(types, inputsBuf)
-        const inputs = ethabi.rawDecode(types, inputsBuf)
+        let inputs = []
+
+        try {
+          inputsBuf = normalizeAddresses(types, inputsBuf)
+          inputs = ethabi.rawDecode(types, inputsBuf)
+        } catch (err) {
+          // TODO: normalize addresses for tuples
+          inputs = ethers.utils.defaultAbiCoder.decode(types, inputsBuf)
+
+          inputs = inputs[0]
+        }
 
         return {
           name,
@@ -140,6 +157,46 @@ function parseTypeArray (type) {
 
 function isArray (type) {
   return type.lastIndexOf(']') === type.length - 1
+}
+
+function handleInputs (input) {
+  let tupleArray = false
+  if (input instanceof Object && input.components) {
+    input = input.components
+    tupleArray = true
+  }
+
+  if (!Array.isArray(input)) {
+    if (input instanceof Object && input.type) {
+      return input.type
+    }
+
+    return input
+  }
+
+  let ret = '(' + input.reduce((acc, x) => {
+    if (x.type === 'tuple') {
+      acc.push(handleInputs(x.components))
+    } else if (x.type === 'tuple[]') {
+      acc.push(handleInputs(x.components) + '[]')
+    } else {
+      acc.push(x.type)
+    }
+    return acc
+  }, []).join(',') + ')'
+
+  if (tupleArray) {
+    return ret + '[]'
+  }
+}
+
+function genMethodId (methodName, types) {
+  const input = methodName + '(' + (types.reduce((acc, x) => {
+    acc.push(handleInputs(x))
+    return acc
+  }, []).join(',')) + ')'
+
+  return ethers.utils.keccak256(Buffer.from(input)).slice(2, 10)
 }
 
 module.exports = InputDataDecoder
