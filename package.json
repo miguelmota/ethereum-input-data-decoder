@@ -1,6 +1,6 @@
 {
   "name": "ethereum-input-data-decoder",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Ethereum smart contract transaction input data decoder",
   "main": "dist/index.js",
   "scripts": {
@@ -33,8 +33,10 @@
   },
   "dependencies": {
     "bn.js": "^4.11.8",
-    "ethereumjs-abi": "^0.6.4",
-    "ethers": "^2.1.3",
+    "buffer": "^5.2.1",
+    "ethereumjs-abi": "^0.6.7",
+    "ethers": "^4.0.27",
+    "is-buffer": "^2.0.3",
     "meow": "^5.0.0"
   },
   "keywords": [

@@ -7,6 +7,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var fs = require('fs');
 var ethabi = require('ethereumjs-abi');
 var ethers = require('ethers');
+var Buffer = require('buffer/').Buffer;
+var isBuffer = require('is-buffer');
 
 var InputDataDecoder = function () {
   function InputDataDecoder(prop) {
@@ -26,7 +28,7 @@ var InputDataDecoder = function () {
   _createClass(InputDataDecoder, [{
     key: 'decodeConstructor',
     value: function decodeConstructor(data) {
-      if (Buffer.isBuffer(data)) {
+      if (isBuffer(data)) {
         data = data.toString('utf8');
       }
 
@@ -52,14 +54,14 @@ var InputDataDecoder = function () {
         data = data.slice(-256);
 
         if (data.length !== 256) {
-          throw new Error('fial');
+          throw new Error('fail');
         }
 
         if (data.indexOf('0x') !== 0) {
           data = '0x' + data;
         }
 
-        var inputs = ethers.Interface.decodeParams(types, data);
+        var inputs = ethers.utils.defaultAbiCoder.decode(types, data);
 
         return {
           name: name,
@@ -73,7 +75,7 @@ var InputDataDecoder = function () {
   }, {
     key: 'decodeData',
     value: function decodeData(data) {
-      if (Buffer.isBuffer(data)) {
+      if (isBuffer(data)) {
         data = data.toString('utf8');
       }
 
