@@ -73,15 +73,14 @@ class InputDataDecoder {
     data = data.trim()
 
     const dataBuf = Buffer.from(data.replace(/^0x/, ''), 'hex')
-    const methodId = dataBuf.subarray(0, 4).toString('hex')
+    const methodId = toHexString(dataBuf.subarray(0, 4))
     var inputsBuf = dataBuf.subarray(4)
-
 
     const result = this.abi.reduce((acc, obj) => {
       if (obj.type === 'constructor') return acc
       const name = obj.name || null
       const types = obj.inputs ? obj.inputs.map(x => x.type) : []
-      const hash = ethabi.methodID(name, types).toString('hex')
+      const hash = toHexString(ethabi.methodID(name, types))
 
       if (hash === methodId) {
         inputsBuf = normalizeAddresses(types, inputsBuf)
@@ -143,6 +142,12 @@ function parseTypeArray (type) {
 
 function isArray (type) {
   return type.lastIndexOf(']') === type.length - 1
+}
+
+function toHexString(byteArray) {
+  return Array.from(byteArray, function(byte) {
+    return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+  }).join('')
 }
 
 module.exports = InputDataDecoder

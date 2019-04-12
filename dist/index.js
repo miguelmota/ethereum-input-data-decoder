@@ -86,7 +86,7 @@ var InputDataDecoder = function () {
       data = data.trim();
 
       var dataBuf = Buffer.from(data.replace(/^0x/, ''), 'hex');
-      var methodId = dataBuf.subarray(0, 4).toString('hex');
+      var methodId = toHexString(dataBuf.subarray(0, 4));
       var inputsBuf = dataBuf.subarray(4);
 
       var result = this.abi.reduce(function (acc, obj) {
@@ -95,7 +95,7 @@ var InputDataDecoder = function () {
         var types = obj.inputs ? obj.inputs.map(function (x) {
           return x.type;
         }) : [];
-        var hash = ethabi.methodID(name, types).toString('hex');
+        var hash = toHexString(ethabi.methodID(name, types));
 
         if (hash === methodId) {
           inputsBuf = normalizeAddresses(types, inputsBuf);
@@ -160,6 +160,12 @@ function parseTypeArray(type) {
 
 function isArray(type) {
   return type.lastIndexOf(']') === type.length - 1;
+}
+
+function toHexString(byteArray) {
+  return Array.from(byteArray, function (byte) {
+    return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+  }).join('');
 }
 
 module.exports = InputDataDecoder;
