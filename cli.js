@@ -52,8 +52,6 @@ if (cli.input && cli.input.length > 0) {
     clearTimeout(t)
     run(abi, input)
   })
-} else {
-  run(abi, input)
 }
 
 function run (abi, input) {

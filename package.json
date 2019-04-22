@@ -1,6 +1,6 @@
 {
   "name": "ethereum-input-data-decoder",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Ethereum smart contract transaction input data decoder",
   "main": "dist/index.js",
   "scripts": {
