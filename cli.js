@@ -33,7 +33,9 @@ if (cli.input && cli.input.length > 0) {
   input = cli.input[0]
   run(abi, input)
 } else if (input) {
-  input = fs.readFileSync(path.resolve(input))
+  try {
+    input = fs.readFileSync(path.resolve(input))
+  } catch(err) { }
   run(abi, input)
 } else {
   input = ''
@@ -57,6 +59,11 @@ if (cli.input && cli.input.length > 0) {
 function run (abi, input) {
   const decoder = new InputDataDecoder(path.resolve(abi))
   const result = decoder.decodeData(input)
+
+  if (result.name === null && result.types.length === 0) {
+    console.log('No matches')
+    return
+  }
 
   const output = [`${'name'.padEnd(10)}${result.name}`]
   for (let i = 0; i < result.types.length; i++) {
