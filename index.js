@@ -1,6 +1,8 @@
 const fs = require('fs')
 const ethabi = require('ethereumjs-abi')
 const ethers = require('ethers')
+const Buffer = require('buffer/').Buffer
+const isBuffer = require('is-buffer')
 
 class InputDataDecoder {
   constructor (prop) {
@@ -16,7 +18,7 @@ class InputDataDecoder {
   }
 
   decodeConstructor (data) {
-    if (Buffer.isBuffer(data)) {
+    if (isBuffer(data)) {
       data = data.toString('utf8')
     }
 
@@ -60,7 +62,7 @@ class InputDataDecoder {
   }
 
   decodeData (data) {
-    if (Buffer.isBuffer(data)) {
+    if (isBuffer(data)) {
       data = data.toString('utf8')
     }
 
@@ -71,7 +73,7 @@ class InputDataDecoder {
     data = data.trim()
 
     const dataBuf = Buffer.from(data.replace(/^0x/, ''), 'hex')
-    const methodId = dataBuf.subarray(0, 4).toString('hex')
+    const methodId = toHexString(dataBuf.subarray(0, 4))
     var inputsBuf = dataBuf.subarray(4)
 
     const result = this.abi.reduce((acc, obj) => {
@@ -197,6 +199,12 @@ function genMethodId (methodName, types) {
   }, []).join(',')) + ')'
 
   return ethers.utils.keccak256(Buffer.from(input)).slice(2, 10)
+}
+
+function toHexString (byteArray) {
+  return Array.from(byteArray, function (byte) {
+    return ('0' + (byte & 0xFF).toString(16)).slice(-2)
+  }).join('')
 }
 
 module.exports = InputDataDecoder

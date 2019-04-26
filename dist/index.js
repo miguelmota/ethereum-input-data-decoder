@@ -7,6 +7,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var fs = require('fs');
 var ethabi = require('ethereumjs-abi');
 var ethers = require('ethers');
+var Buffer = require('buffer/').Buffer;
+var isBuffer = require('is-buffer');
 
 var InputDataDecoder = function () {
   function InputDataDecoder(prop) {
@@ -26,7 +28,7 @@ var InputDataDecoder = function () {
   _createClass(InputDataDecoder, [{
     key: 'decodeConstructor',
     value: function decodeConstructor(data) {
-      if (Buffer.isBuffer(data)) {
+      if (isBuffer(data)) {
         data = data.toString('utf8');
       }
 
@@ -59,12 +61,7 @@ var InputDataDecoder = function () {
           data = '0x' + data;
         }
 
-        console.log(obj.inputs);
-        console.log(types);
-        console.log(data);
-
-        var inputs = ethers.Interface.decodeParams(types, data);
-        console.log('here', inputs);
+        var inputs = ethers.utils.defaultAbiCoder.decode(types, data);
 
         return {
           name: name,
@@ -78,7 +75,7 @@ var InputDataDecoder = function () {
   }, {
     key: 'decodeData',
     value: function decodeData(data) {
-      if (Buffer.isBuffer(data)) {
+      if (isBuffer(data)) {
         data = data.toString('utf8');
       }
 
@@ -89,7 +86,7 @@ var InputDataDecoder = function () {
       data = data.trim();
 
       var dataBuf = Buffer.from(data.replace(/^0x/, ''), 'hex');
-      var methodId = dataBuf.subarray(0, 4).toString('hex');
+      var methodId = toHexString(dataBuf.subarray(0, 4));
       var inputsBuf = dataBuf.subarray(4);
 
       var result = this.abi.reduce(function (acc, obj) {
@@ -97,13 +94,27 @@ var InputDataDecoder = function () {
         if (obj.type === 'event') return acc;
         var name = obj.name || null;
         var types = obj.inputs ? obj.inputs.map(function (x) {
-          return x.type;
+          if (x.type === 'tuple[]') {
+            return x;
+          } else {
+            return x.type;
+          }
         }) : [];
-        var hash = ethabi.methodID(name, types).toString('hex');
+
+        var hash = genMethodId(name, types);
 
         if (hash === methodId) {
-          inputsBuf = normalizeAddresses(types, inputsBuf);
-          var inputs = ethabi.rawDecode(types, inputsBuf);
+          var inputs = [];
+
+          try {
+            inputsBuf = normalizeAddresses(types, inputsBuf);
+            inputs = ethabi.rawDecode(types, inputsBuf);
+          } catch (err) {
+            // TODO: normalize addresses for tuples
+            inputs = ethers.utils.defaultAbiCoder.decode(types, inputsBuf);
+
+            inputs = inputs[0];
+          }
 
           return {
             name: name,
@@ -164,6 +175,52 @@ function parseTypeArray(type) {
 
 function isArray(type) {
   return type.lastIndexOf(']') === type.length - 1;
+}
+
+function handleInputs(input) {
+  var tupleArray = false;
+  if (input instanceof Object && input.components) {
+    input = input.components;
+    tupleArray = true;
+  }
+
+  if (!Array.isArray(input)) {
+    if (input instanceof Object && input.type) {
+      return input.type;
+    }
+
+    return input;
+  }
+
+  var ret = '(' + input.reduce(function (acc, x) {
+    if (x.type === 'tuple') {
+      acc.push(handleInputs(x.components));
+    } else if (x.type === 'tuple[]') {
+      acc.push(handleInputs(x.components) + '[]');
+    } else {
+      acc.push(x.type);
+    }
+    return acc;
+  }, []).join(',') + ')';
+
+  if (tupleArray) {
+    return ret + '[]';
+  }
+}
+
+function genMethodId(methodName, types) {
+  var input = methodName + '(' + types.reduce(function (acc, x) {
+    acc.push(handleInputs(x));
+    return acc;
+  }, []).join(',') + ')';
+
+  return ethers.utils.keccak256(Buffer.from(input)).slice(2, 10);
+}
+
+function toHexString(byteArray) {
+  return Array.from(byteArray, function (byte) {
+    return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+  }).join('');
 }
 
 module.exports = InputDataDecoder;
