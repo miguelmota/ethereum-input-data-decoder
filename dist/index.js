@@ -45,9 +45,12 @@ var InputDataDecoder = function () {
           continue;
         }
 
-        var name = obj.name || null;
+        var method = obj.name || null;
         var types = obj.inputs ? obj.inputs.map(function (x) {
           return x.type;
+        }) : [];
+        var names = obj.inputs ? obj.inputs.map(function (x) {
+          return x.name;
         }) : [];
 
         // take last 32 bytes
@@ -64,9 +67,10 @@ var InputDataDecoder = function () {
         var inputs = ethers.utils.defaultAbiCoder.decode(types, data);
 
         return {
-          name: name,
+          method: method,
           types: types,
-          inputs: inputs
+          inputs: inputs,
+          names: names
         };
       }
 
@@ -92,7 +96,7 @@ var InputDataDecoder = function () {
       var result = this.abi.reduce(function (acc, obj) {
         if (obj.type === 'constructor') return acc;
         if (obj.type === 'event') return acc;
-        var name = obj.name || null;
+        var method = obj.name || null;
         var types = obj.inputs ? obj.inputs.map(function (x) {
           if (x.type === 'tuple[]') {
             return x;
@@ -101,7 +105,15 @@ var InputDataDecoder = function () {
           }
         }) : [];
 
-        var hash = genMethodId(name, types);
+        var names = obj.inputs ? obj.inputs.map(function (x) {
+          if (x.type === 'tuple[]') {
+            return '';
+          } else {
+            return x.name;
+          }
+        }) : [];
+
+        var hash = genMethodId(method, types);
 
         if (hash === methodId) {
           var inputs = [];
@@ -117,16 +129,17 @@ var InputDataDecoder = function () {
           }
 
           return {
-            name: name,
+            method: method,
             types: types,
-            inputs: inputs
+            inputs: inputs,
+            names: names
           };
         }
 
         return acc;
-      }, { name: null, types: [], inputs: [] });
+      }, { method: null, types: [], inputs: [], names: [] });
 
-      if (!result.name) {
+      if (!result.method) {
         try {
           var decoded = this.decodeConstructor(data);
           if (decoded) {

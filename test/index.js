@@ -11,7 +11,7 @@ test('decoder', t => {
     const decoder = new InputDataDecoder(`${__dirname}/data/abi1.json`)
 
     const result = decoder.decodeData(data)
-    t.equal(result.name, 'registerOffChainDonation')
+    t.equal(result.method, 'registerOffChainDonation')
     t.deepEqual(result.types, [
       'address',
       'uint256',
@@ -27,29 +27,24 @@ test('decoder', t => {
   })
 
   t.test('abi array object', t => {
-    t.plan(6)
+    t.plan(7)
     const abi = JSON.parse(fs.readFileSync(`${__dirname}/data/abi1.json`))
     const decoder = new InputDataDecoder(abi)
 
     const result = decoder.decodeData(data)
-    t.equal(result.name, 'registerOffChainDonation')
-    t.deepEqual(result.types, [
-      'address',
-      'uint256',
-      'uint256',
-      'string',
-      'bytes32'
-    ])
+    t.equal(result.method, 'registerOffChainDonation')
+    t.deepEqual(result.types, ['address', 'uint256', 'uint256', 'string', 'bytes32'])
     t.equal(result.inputs[0].toString(16), '5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02')
     t.equal(result.inputs[1].toString(16), '58a20230')
     t.equal(result.inputs[2].toString(16), '402934')
     t.equal(result.inputs[3], 'BTC')
+    t.deepEqual(result.names, ['addr', 'timestamp', 'chfCents', 'currency', 'memo'])
     t.end()
   })
 
   // https://etherscan.io/tx/0xc7add41f6ae5e4fe268f654709f450983510ab7da67812be608faf2133a90b5a
-  t.test('contract creation data', t => {
-    t.plan(2)
+  t.test('contract creation data (constructor)', t => {
+    t.plan(4)
 
     const abi = JSON.parse(fs.readFileSync(`${__dirname}/data/abi1.json`))
     const decoder = new InputDataDecoder(abi)
@@ -59,11 +54,14 @@ test('decoder', t => {
 
     t.equal(result.inputs[0].toString(16), '0xB2Cb826C945D8Df01802b5cf3c4105685D4933A0')
     t.equal(result.inputs[1].toString(16), 'STIFTUNG Dfinity FDC')
+
+    t.equal(result.names[0].toString(), '_masterAuth')
+    t.equal(result.names[1].toString(), '_name')
   })
 
   // https://etherscan.io/tx/0x94fadf5f5c7805b8ceb8a13a0a7fbce06054ff08cdfdc2fd555a7902592aebe6
   t.test('erc721 transferFrom', t => {
-    t.plan(3)
+    t.plan(6)
 
     const abi = JSON.parse(fs.readFileSync(`${__dirname}/data/erc721_abi.json`))
     const decoder = new InputDataDecoder(abi)
@@ -74,6 +72,11 @@ test('decoder', t => {
     t.equal(result.inputs[0].toString(16), '10017ca37b1257ac0771e24652aa28c758e378eb')
     t.equal(result.inputs[1].toString(16), 'e7a632d89104385bdd3992eeb82cffeb48e4e539')
     t.equal(result.inputs[2].toString(16), '5dc5')
+
+
+    t.equal(result.names[0], '_from')
+    t.equal(result.names[1], '_to')
+    t.equal(result.names[2], '_tokenId')
   })
 
   t.test('abiv2', t => {

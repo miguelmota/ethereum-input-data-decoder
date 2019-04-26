@@ -52,7 +52,7 @@ console.log(result);
 
 ```text
 {
-  "name": "registerOffChainDonation",
+  "method": "registerOffChainDonation",
   "types": [
     "address",
     "uint256",
@@ -66,6 +66,13 @@ console.log(result);
       <BN: 402934>,
       "BTC",
       <Buffer f3 df ... 71 c8>
+    ],
+    "names": [
+      "addr",
+      "timestamp",
+      "chfCents",
+      "currency",
+      "memo"
     ]
 }
 ```
@@ -132,12 +139,13 @@ Pass ABI file and input data as file:
 ```bash
 $ ethereum_input_data_decoder --abi abi.json --input data.tx
 
-name      registerOffChainDonation
-address   0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
-uint256   1487012400
-uint256   4204852
-string    BTC
-bytes32   0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
+method   registerOffChainDonation
+
+address  addr       0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
+uint256  timestamp  1487012400
+uint256  chfCents   4204852
+string   currency   BTC
+bytes32  memo       0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
 ```
 
 Pass ABI file and input data as string:
@@ -145,12 +153,13 @@ Pass ABI file and input data as string:
 ```bash
 $ ethereum_input_data_decoder --abi abi.json 0x67043cae0...000000
 
-name      registerOffChainDonation
-address   0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
-uint256   1487012400
-uint256   4204852
-string    BTC
-bytes32   0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
+method   registerOffChainDonation
+
+address  addr       0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
+uint256  timestamp  1487012400
+uint256  chfCents   4204852
+string   currency   BTC
+bytes32  memo       0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
 ```
 
 You can also pipe the input data:
@@ -158,12 +167,13 @@ You can also pipe the input data:
 ```bash
 $ cat data.txt | ethereum_input_data_decoder --abi abi.json
 
-name      registerOffChainDonation
-address   0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
-uint256   1487012400
-uint256   4204852
-string    BTC
-bytes32   0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
+method   registerOffChainDonation
+
+address  addr       0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
+uint256  timestamp  1487012400
+uint256  chfCents   4204852
+string   currency   BTC
+bytes32  memo       0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
 ```
 
 ## Test
@@ -215,6 +225,10 @@ npm test
 - Q: Can this library decode contract creation input data?
 
   - A: Yes, it can decode contract creation input data.
+
+- Q: Does this library support ABIEncoderV2?
+
+  - A: Yes, but it's buggy. Please submit a [bug report](https://github.com/miguelmota/ethereum-input-data-decoder/issues/new) if you encounter issues.
 
 ## License
 

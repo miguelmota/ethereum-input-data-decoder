@@ -35,8 +35,9 @@ class InputDataDecoder {
         continue
       }
 
-      const name = obj.name || null
+      const method = obj.name || null
       const types = obj.inputs ? obj.inputs.map(x => x.type) : []
+      const names = obj.inputs ? obj.inputs.map(x => x.name) : []
 
       // take last 32 bytes
       data = data.slice(-256)
@@ -52,9 +53,10 @@ class InputDataDecoder {
       const inputs = ethers.utils.defaultAbiCoder.decode(types, data)
 
       return {
-        name,
+        method,
         types,
-        inputs
+        inputs,
+        names
       }
     }
 
@@ -79,7 +81,7 @@ class InputDataDecoder {
     const result = this.abi.reduce((acc, obj) => {
       if (obj.type === 'constructor') return acc
       if (obj.type === 'event') return acc
-      const name = obj.name || null
+      const method = obj.name || null
       let types = obj.inputs ? obj.inputs.map(x => {
         if (x.type === 'tuple[]') {
           return x
@@ -88,7 +90,15 @@ class InputDataDecoder {
         }
       }) : []
 
-      const hash = genMethodId(name, types)
+      let names = obj.inputs ? obj.inputs.map(x => {
+        if (x.type === 'tuple[]') {
+          return ''
+        } else {
+          return x.name
+        }
+      }) : []
+
+      const hash = genMethodId(method, types)
 
       if (hash === methodId) {
         let inputs = []
@@ -104,16 +114,17 @@ class InputDataDecoder {
         }
 
         return {
-          name,
+          method,
           types,
-          inputs
+          inputs,
+          names
         }
       }
 
       return acc
-    }, { name: null, types: [], inputs: [] })
+    }, { method: null, types: [], inputs: [], names: [] })
 
-    if (!result.name) {
+    if (!result.method) {
       try {
         const decoded = this.decodeConstructor(data)
         if (decoded) {
