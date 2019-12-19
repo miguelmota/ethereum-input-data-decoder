@@ -83,7 +83,7 @@ class InputDataDecoder {
       if (obj.type === 'event') return acc
       const method = obj.name || null
       let types = obj.inputs ? obj.inputs.map(x => {
-        if (x.type === 'tuple[]') {
+        if (x.type === 'tuple[]' || x.type === 'tuple') {
           return x
         } else {
           return x.type
@@ -93,6 +93,8 @@ class InputDataDecoder {
       let names = obj.inputs ? obj.inputs.map(x => {
         if (x.type === 'tuple[]') {
           return ''
+        } else if (x.type === 'tuple') {
+          return [x.name, x.components.map(a => a.name)]
         } else {
           return x.name
         }
@@ -107,15 +109,26 @@ class InputDataDecoder {
           inputsBuf = normalizeAddresses(types, inputsBuf)
           inputs = ethabi.rawDecode(types, inputsBuf)
         } catch (err) {
-          // TODO: normalize addresses for tuples
-          inputs = ethers.utils.defaultAbiCoder.decode(types, inputsBuf)
+          // defaultAbiCoder attaches some unwanted properties to the list
+          // remove them by spreading the inputs into a new list
+          inputs = [...ethers.utils.defaultAbiCoder.decode(types, inputsBuf)]
 
-          inputs = inputs[0]
+          // TODO: normalize addresses for tuples
         }
+
+        // Map any tuple types into arrays
+        const typesToReturn = types.map(t => {
+          if (t.components) {
+            return t.components.reduce((acc, cur) => {
+              return [...acc, cur.name]
+            }, [])
+          }
+          return t
+        })
 
         return {
           method,
-          types,
+          types: typesToReturn,
           inputs,
           names
         }
@@ -199,7 +212,7 @@ function handleInputs (input) {
   }, []).join(',') + ')'
 
   if (tupleArray) {
-    return ret + '[]'
+    return ret
   }
 }
 

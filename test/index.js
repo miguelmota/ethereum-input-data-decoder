@@ -88,11 +88,74 @@ test('decoder', t => {
     const data = fs.readFileSync(`${__dirname}/data/abiv2_input_data.txt`)
     const result = decoder.decodeData(data)
 
+    console.log({result});
+
     t.equal(result.inputs[0].id.toString(10), '2')
     t.equal(result.inputs[0].state.toString(10), '2')
     t.equal(result.inputs[0].valuation.toString(10), '50')
     t.equal(result.inputs[0].fingerprint.toString(), '0xabcd000000000000000000000000000000000000000000000000000000000000')
     t.equal(result.inputs[0].countdown.toString(10), '1549925124')
+  })
+
+  // https://etherscan.io/tx/0xcb0c447659123c5faa2f1e5bc8ac69697688f437c92a8abb4b882bb33cbc661a
+  t.test('set issuance (abiv2 tuple)', t => {
+    t.plan(11)
+
+    const abi = JSON.parse(fs.readFileSync(`${__dirname}/data/set_exchange_issuance_lib.json`))
+    const decoder = new InputDataDecoder(abi)
+
+    const data = fs.readFileSync(`${__dirname}/data/set_issuance.txt`)
+    const result = decoder.decodeData(data)
+
+    // inputs are correct
+    t.equal(result.inputs[0], '0x81c55017F7Ce6E72451cEd49FF7bAB1e3DF64d0C')
+    t.equal(result.inputs[1].toString(), '2810697751873000000')
+    t.equal(result.inputs[2][0], '0xA37dE6790861B5541b0dAa7d0C0e651F44c6f4D9')
+    t.equal(result.inputs[2][1].toString(), '16878240000000000')
+    t.deepEqual(result.inputs[2][2], [1])
+    t.deepEqual(result.inputs[2][3], ['0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'])
+    t.deepEqual(result.inputs[2][4], [{ _hex: '0x1a04a045412d3457' }])
+    t.deepEqual(result.inputs[2][5], ['0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359', '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599'])
+    t.deepEqual(result.inputs[2][6], [{ _hex: '0x06989640c83ea4a200' }, { _hex: '0x19c110' }])
+
+    // names are correct
+    const expectedNames = [
+      '_rebalancingSetAddress',
+      '_rebalancingSetQuantity',
+      [
+        '_exchangeIssuanceParams',
+        [
+          'setAddress',
+          'quantity',
+          'sendTokenExchangeIds',
+          'sendTokens',
+          'sendTokenAmounts',
+          'receiveTokens',
+          'receiveTokenAmounts'
+        ]
+      ],
+      '_orderData',
+      '_keepChangeInVault'
+    ]
+    t.deepEqual(result.names, expectedNames)
+
+    // types are correct
+    const expectedTypes = [
+      'address',
+      'uint256',
+      [
+        'setAddress',
+        'quantity',
+        'sendTokenExchangeIds',
+        'sendTokens',
+        'sendTokenAmounts',
+        'receiveTokens',
+        'receiveTokenAmounts'
+      ],
+      'bytes',
+      'bool'
+    ]
+    t.deepEqual(result.types, expectedTypes)
   })
 
   // https://github.com/miguelmota/ethereum-input-data-decoder/issues/8
