@@ -83,7 +83,7 @@ class InputDataDecoder {
       if (obj.type === 'event') return acc
       const method = obj.name || null
       let types = obj.inputs ? obj.inputs.map(x => {
-        if (x.type === 'tuple[]' || x.type === 'tuple') {
+        if (x.type.includes('tuple')) {
           return x
         } else {
           return x.type
