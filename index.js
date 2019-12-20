@@ -117,7 +117,8 @@ class InputDataDecoder {
         // Map any tuple types into arrays
         const typesToReturn = types.map(t => {
           if (t.components) {
-            return t.components.reduce((acc, cur) => [...acc, cur.type], [])
+            const arr = t.components.reduce((acc, cur) => [...acc, cur.type], [])
+            return `(${arr.join(',')})`
           }
           return t
         })

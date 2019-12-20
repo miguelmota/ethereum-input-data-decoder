@@ -147,15 +147,7 @@ test('decoder', t => {
     const expectedTypes = [
       'address',
       'uint256',
-      [
-        'address',
-        'uint256',
-        'uint8[]',
-        'address[]',
-        'uint256[]',
-        'address[]',
-        'uint256[]'
-      ],
+      '(address,uint256,uint8[],address[],uint256[],address[],uint256[])',
       'bytes',
       'bool'
     ]
