@@ -91,9 +91,7 @@ class InputDataDecoder {
       }) : []
 
       let names = obj.inputs ? obj.inputs.map(x => {
-        if (x.type === 'tuple[]') {
-          return ''
-        } else if (x.type === 'tuple') {
+        if (x.type.includes('tuple')) {
           return [x.name, x.components.map(a => a.name)]
         } else {
           return x.name
@@ -119,9 +117,7 @@ class InputDataDecoder {
         // Map any tuple types into arrays
         const typesToReturn = types.map(t => {
           if (t.components) {
-            return t.components.reduce((acc, cur) => {
-              return [...acc, cur.name]
-            }, [])
+            return t.components.reduce((acc, cur) => [...acc, cur.type], [])
           }
           return t
         })
@@ -185,11 +181,9 @@ function isArray (type) {
   return type.lastIndexOf(']') === type.length - 1
 }
 
-function handleInputs (input) {
-  let tupleArray = false
+function handleInputs (input, tupleArray) {
   if (input instanceof Object && input.components) {
     input = input.components
-    tupleArray = true
   }
 
   if (!Array.isArray(input)) {
@@ -212,13 +206,15 @@ function handleInputs (input) {
   }, []).join(',') + ')'
 
   if (tupleArray) {
-    return ret
+    return ret + '[]'
   }
+
+  return ret
 }
 
 function genMethodId (methodName, types) {
   const input = methodName + '(' + (types.reduce((acc, x) => {
-    acc.push(handleInputs(x))
+    acc.push(handleInputs(x, x.type === 'tuple[]'))
     return acc
   }, []).join(',')) + ')'
 
