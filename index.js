@@ -111,7 +111,20 @@ class InputDataDecoder {
           // defaultAbiCoder attaches some unwanted properties to the list object
           inputs = deepRemoveUnwantedArrayProperties(inputs)
 
-          // TODO: normalize addresses for tuples
+          // TODO: do this normalization into normalizeAddresses
+          inputs = inputs.map((input, i) => {
+            if (types[i].components) {
+              const tupleTypes = types[i].components
+              return deepStripTupleAddresses(input, tupleTypes)
+            }
+            if (types[i] === 'address') {
+              return input.split('0x')[1]
+            }
+            if (types[i] === 'address[]') {
+              return input.map(address => address.split('0x')[1])
+            }
+            return input
+          })
         }
 
         // Map any tuple types into arrays
@@ -147,6 +160,21 @@ class InputDataDecoder {
 
     return result
   }
+}
+
+// remove 0x from addresses
+function deepStripTupleAddresses(input, tupleTypes) {
+  return input.map((item, i) => {
+    const type = tupleTypes[i].type
+    if (type === 'address') {
+      return item.split('0x')[1]
+    }
+    if (type === 'address[]') {
+      return item.map(a => a.split('0x')[1])
+    }
+    return item
+  })
+  console.log({input, tupleTypes});
 }
 
 function deepRemoveUnwantedArrayProperties (arr) {

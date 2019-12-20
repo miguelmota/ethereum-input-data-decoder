@@ -161,17 +161,17 @@ test('decoder', t => {
     t.equal(result.method, 'issueRebalancingSetWithEther')
 
     const expectedInputs = [
-      "0x81c55017F7Ce6E72451cEd49FF7bAB1e3DF64d0C",
+      "81c55017F7Ce6E72451cEd49FF7bAB1e3DF64d0C",
       { "_hex": "0x27019ab6af611240" },
       [
-        "0xA37dE6790861B5541b0dAa7d0C0e651F44c6f4D9",
+        "A37dE6790861B5541b0dAa7d0C0e651F44c6f4D9",
         { "_hex": "0x3bf6ab7ba24000" },
         [ 1 ],
-        [ "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" ],
+        [ "C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" ],
         [{ "_hex": "0x1a04a045412d3457" }],
         [
-          "0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359",
-          "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"
+          "89d24A6b4CcB1B6fAA2625fE562bDD9a23260359",
+          "2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"
         ],
         [
           { "_hex": "0x06989640c83ea4a200" },
