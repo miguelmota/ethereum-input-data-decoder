@@ -100,7 +100,7 @@ var InputDataDecoder = function () {
         if (obj.type === 'event') return acc;
         var method = obj.name || null;
         var types = obj.inputs ? obj.inputs.map(function (x) {
-          if (x.type === 'tuple[]' || x.type === 'tuple') {
+          if (x.type.includes('tuple')) {
             return x;
           } else {
             return x.type;
@@ -127,8 +127,7 @@ var InputDataDecoder = function () {
             inputs = ethabi.rawDecode(types, inputsBuf);
           } catch (err) {
             inputs = ethers.utils.defaultAbiCoder.decode(types, inputsBuf);
-            // defaultAbiCoder attaches some unwanted properties to the list
-            // remove them by spreading the inputs into a new list
+            // defaultAbiCoder attaches some unwanted properties to the list object
             inputs = deepRemoveUnwantedArrayProperties(inputs);
 
             // TODO: normalize addresses for tuples
