@@ -107,9 +107,10 @@ class InputDataDecoder {
           inputsBuf = normalizeAddresses(types, inputsBuf)
           inputs = ethabi.rawDecode(types, inputsBuf)
         } catch (err) {
+          inputs = ethers.utils.defaultAbiCoder.decode(types, inputsBuf)
           // defaultAbiCoder attaches some unwanted properties to the list
           // remove them by spreading the inputs into a new list
-          inputs = [...ethers.utils.defaultAbiCoder.decode(types, inputsBuf)]
+          inputs = deepRemoveUnwantedArrayProperties(inputs)
 
           // TODO: normalize addresses for tuples
         }
@@ -118,7 +119,9 @@ class InputDataDecoder {
         const typesToReturn = types.map(t => {
           if (t.components) {
             const arr = t.components.reduce((acc, cur) => [...acc, cur.type], [])
-            return `(${arr.join(',')})`
+            const tupleStr = `(${arr.join(',')})`
+            if (t.type === 'tuple[]') return tupleStr + '[]'
+            return tupleStr
           }
           return t
         })
@@ -145,6 +148,13 @@ class InputDataDecoder {
 
     return result
   }
+}
+
+function deepRemoveUnwantedArrayProperties (arr) {
+  return [...arr.map(item => {
+    if (Array.isArray(item)) return deepRemoveUnwantedArrayProperties(item)
+    return item
+  })]
 }
 
 function normalizeAddresses (types, input) {
