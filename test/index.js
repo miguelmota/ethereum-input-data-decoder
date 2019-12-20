@@ -214,7 +214,7 @@ test('decoder', t => {
     t.deepEqual(result.types, expectedTypes)
   })
 
-//   // https://github.com/miguelmota/ethereum-input-data-decoder/issues/8
+  // https://github.com/miguelmota/ethereum-input-data-decoder/issues/8
   t.test('256 address', t => {
     t.plan(2)
     const decoder = new InputDataDecoder(`${__dirname}/data/abi2.json`)
