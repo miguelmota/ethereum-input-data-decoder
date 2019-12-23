@@ -90,6 +90,36 @@ web3.eth.getTransaction(txHash, (error, txResult) => {
 });
 ```
 
+### Decoding tuple and tuple[] types
+
+Where `OrderData` is
+
+```solidity
+struct OrderData {
+  uint256 amount;
+  address buyer;
+}
+```
+
+decoding input to a method `someMethod(address,OrderData,OrderData[])` returns data in format
+
+```js
+{
+  method: 'someMethod',
+  types: ['address', '(uint256,address)', '(uint256,address)[]'],
+  inputs: [
+    '0x81c55017F7Ce6E72451cEd49FF7bAB1e3DF64d0C',
+    [100, '0xA37dE6790861B5541b0dAa7d0C0e651F44c6f4D9']
+    [[274, '0xea674fdde714fd979de3edf0f56aa9716b898ec8']]
+  ],
+  names: ['sender', ['order', ['amount', 'buyer']], ['allOrders', ['amount', 'buyer']]]
+}
+```
+
+- In the `types` field, tuples are represented as a string containing types contained in the tuple
+- In the `inputs` field, tuples are represented as an array containing values contained in the tuple
+- In the `names` field, tuples are represented as an array with 2 items. Item 1 is the name of the tuple, item 2 is an array containing the names of the values contained in the tuple.
+
 ### Decoding Big Numbers
 
 All numbers are returned in [big number](https://github.com/indutny/bn.js) format to preserve precision.
@@ -213,7 +243,7 @@ npm test
 5. Run linter:
 
   ```bash
-  npm run lint:fix
+  npm run lint
   ```
 
 ## Contributing
