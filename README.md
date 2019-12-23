@@ -101,7 +101,7 @@ struct OrderData {
 }
 ```
 
-decoding input to a method `someMethod(address,OrderData,OrderData[])` returns data in format
+Decoding input to a method `someMethod(address,OrderData,OrderData[])` returns data in format
 
 ```js
 {
@@ -251,6 +251,8 @@ npm test
 Pull requests are welcome!
 
 For contributions please create a new branch and submit a pull request for review.
+
+Many thanks to all the [contributors](https://github.com/miguelmota/ethereum-input-data-decoder/graphs/contributors) for making this a better library for everyone 🙏
 
 ## FAQ
 
