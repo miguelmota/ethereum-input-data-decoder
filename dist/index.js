@@ -194,18 +194,16 @@ var InputDataDecoder = function () {
 function deepStripTupleAddresses(input, tupleTypes) {
   return input.map(function (item, i) {
     var type = tupleTypes[i].type;
-    if (type === 'address') {
-      console.log(item);
+    if (type === 'address' && typeof item === 'string') {
       return item.split('0x')[1];
     }
-    if (type === 'address[]') {
+    if (type === 'address[]' || Array.isArray()) {
       return item.map(function (a) {
         return a.split('0x')[1];
       });
     }
     return item;
   });
-  console.log({ input: input, tupleTypes: tupleTypes });
 }
 
 function deepRemoveUnwantedArrayProperties(arr) {
