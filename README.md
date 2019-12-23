@@ -243,7 +243,7 @@ npm test
 5. Run linter:
 
   ```bash
-  npm run lint:fix
+  npm run lint
   ```
 
 ## Contributing

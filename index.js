@@ -163,18 +163,17 @@ class InputDataDecoder {
 }
 
 // remove 0x from addresses
-function deepStripTupleAddresses(input, tupleTypes) {
+function deepStripTupleAddresses (input, tupleTypes) {
   return input.map((item, i) => {
     const type = tupleTypes[i].type
-    if (type === 'address') {
+    if (type === 'address' && typeof item === 'string') {
       return item.split('0x')[1]
     }
-    if (type === 'address[]') {
+    if (type === 'address[]' || Array.isArray()) {
       return item.map(a => a.split('0x')[1])
     }
     return item
   })
-  console.log({input, tupleTypes});
 }
 
 function deepRemoveUnwantedArrayProperties (arr) {
