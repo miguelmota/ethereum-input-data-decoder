@@ -248,7 +248,9 @@ npm test
 
 ## Contributing
 
-Pull requests are welcome! Fork, branch, and submit PR.
+Pull requests are welcome!
+
+For contributions please create a new branch and submit a pull request for review.
 
 ## FAQ
 
