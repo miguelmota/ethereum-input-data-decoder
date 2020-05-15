@@ -10,7 +10,11 @@
 
 > Ethereum smart contract transaction input data decoder
 
-[![License](http://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/miguelmota/ethereum-input-data-decoder/master/LICENSE) [![Build Status](https://travis-ci.org/miguelmota/ethereum-input-data-decoder.svg?branch=master)](https://travis-ci.org/miguelmota/ethereum-input-data-decoder) [![dependencies Status](https://david-dm.org/miguelmota/ethereum-input-data-decoder/status.svg)](https://david-dm.org/miguelmota/ethereum-input-data-decoder) [![NPM version](https://badge.fury.io/js/ethereum-input-data-decoder.svg)](http://badge.fury.io/js/ethereum-input-data-decoder)
+[![License](http://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/miguelmota/ethereum-input-data-decoder/master/LICENSE)
+[![Build Status](https://travis-ci.org/miguelmota/ethereum-input-data-decoder.svg?branch=master)](https://travis-ci.org/miguelmota/ethereum-input-data-decoder)
+[![dependencies Status](https://david-dm.org/miguelmota/ethereum-input-data-decoder/status.svg)](https://david-dm.org/miguelmota/ethereum-input-data-decoder)
+[![NPM version](https://badge.fury.io/js/ethereum-input-data-decoder.svg)](http://badge.fury.io/js/ethereum-input-data-decoder)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
 ## Demo
 
@@ -52,7 +56,7 @@ console.log(result);
 
 ```text
 {
-  "name": "registerOffChainDonation",
+  "method": "registerOffChainDonation",
   "types": [
     "address",
     "uint256",
@@ -66,6 +70,13 @@ console.log(result);
       <BN: 402934>,
       "BTC",
       <Buffer f3 df ... 71 c8>
+    ],
+    "names": [
+      "addr",
+      "timestamp",
+      "chfCents",
+      "currency",
+      "memo"
     ]
 }
 ```
@@ -78,6 +89,36 @@ web3.eth.getTransaction(txHash, (error, txResult) => {
   console.log(result);
 });
 ```
+
+### Decoding tuple and tuple[] types
+
+Where `OrderData` is
+
+```solidity
+struct OrderData {
+  uint256 amount;
+  address buyer;
+}
+```
+
+Decoding input to a method `someMethod(address,OrderData,OrderData[])` returns data in format
+
+```js
+{
+  method: 'someMethod',
+  types: ['address', '(uint256,address)', '(uint256,address)[]'],
+  inputs: [
+    '0x81c55017F7Ce6E72451cEd49FF7bAB1e3DF64d0C',
+    [100, '0xA37dE6790861B5541b0dAa7d0C0e651F44c6f4D9']
+    [[274, '0xea674fdde714fd979de3edf0f56aa9716b898ec8']]
+  ],
+  names: ['sender', ['order', ['amount', 'buyer']], ['allOrders', ['amount', 'buyer']]]
+}
+```
+
+- In the `types` field, tuples are represented as a string containing types contained in the tuple
+- In the `inputs` field, tuples are represented as an array containing values contained in the tuple
+- In the `names` field, tuples are represented as an array with 2 items. Item 1 is the name of the tuple, item 2 is an array containing the names of the values contained in the tuple.
 
 ### Decoding Big Numbers
 
@@ -132,12 +173,13 @@ Pass ABI file and input data as file:
 ```bash
 $ ethereum_input_data_decoder --abi abi.json --input data.tx
 
-name      registerOffChainDonation
-address   0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
-uint256   1487012400
-uint256   4204852
-string    BTC
-bytes32   0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
+method   registerOffChainDonation
+
+address  addr       0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
+uint256  timestamp  1487012400
+uint256  chfCents   4204852
+string   currency   BTC
+bytes32  memo       0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
 ```
 
 Pass ABI file and input data as string:
@@ -145,12 +187,13 @@ Pass ABI file and input data as string:
 ```bash
 $ ethereum_input_data_decoder --abi abi.json 0x67043cae0...000000
 
-name      registerOffChainDonation
-address   0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
-uint256   1487012400
-uint256   4204852
-string    BTC
-bytes32   0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
+method   registerOffChainDonation
+
+address  addr       0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
+uint256  timestamp  1487012400
+uint256  chfCents   4204852
+string   currency   BTC
+bytes32  memo       0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
 ```
 
 You can also pipe the input data:
@@ -158,12 +201,13 @@ You can also pipe the input data:
 ```bash
 $ cat data.txt | ethereum_input_data_decoder --abi abi.json
 
-name      registerOffChainDonation
-address   0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
-uint256   1487012400
-uint256   4204852
-string    BTC
-bytes32   0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
+method   registerOffChainDonation
+
+address  addr       0x5a9dac9315fdd1c3d13ef8af7fdfeb522db08f02
+uint256  timestamp  1487012400
+uint256  chfCents   4204852
+string   currency   BTC
+bytes32  memo       0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8
 ```
 
 ## Test
@@ -199,8 +243,16 @@ npm test
 5. Run linter:
 
   ```bash
-  npm run lint:fix
+  npm run lint
   ```
+
+## Contributing
+
+Pull requests are welcome!
+
+For contributions please create a new branch and submit a pull request for review.
+
+Many thanks to all the [contributors](https://github.com/miguelmota/ethereum-input-data-decoder/graphs/contributors) for making this a better library for everyone 🙏
 
 ## FAQ
 
@@ -215,6 +267,10 @@ npm test
 - Q: Can this library decode contract creation input data?
 
   - A: Yes, it can decode contract creation input data.
+
+- Q: Does this library support ABIEncoderV2?
+
+  - A: Yes, but it's buggy. Please submit a [bug report](https://github.com/miguelmota/ethereum-input-data-decoder/issues/new) if you encounter issues.
 
 ## License
 
