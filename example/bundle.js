@@ -202,12 +202,12 @@ class InputDataDecoder {
 
 // remove 0x from addresses
 function deepStripTupleAddresses (input, tupleTypes) {
+  // check for deeper nested tuples recursively
   if (Array.isArray(input[0])) {
     return input.map(function (item) {
-      return deepStripTupleAddresses(item, tupleTypes);
+      return deepStripTupleAddresses(item, tupleTypes)
     })
   }
-
 
   return input.map((item, i) => {
     const type = tupleTypes[i].type

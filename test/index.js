@@ -288,8 +288,6 @@ test('decoder', t => {
     t.plan(6)
     const decoder = new InputDataDecoder(`${__dirname}/data/1inch_exchange_v2_abi.json`)
 
-    
-
     // https://etherscan.io/tx/0x4a62d52b5d084476e2cfd6eb4c5dfd8378147aa0186e117ed2710a7e54985ecf
     const dataWithWeth = fs.readFileSync(`${__dirname}/data/1inch_exchange_v2_abi_with_eth.txt`)
     // https://etherscan.io/tx/0x8ac7a9f4f9c8e788b2a4cb29e95f369ba09f0ef4c1bd064e6aa1517ce9247d38
