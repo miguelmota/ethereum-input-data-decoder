@@ -134,14 +134,7 @@ var InputDataDecoder = function () {
             inputs = inputs.map(function (input, i) {
               if (types[i].components) {
                 var tupleTypes = types[i].components;
-                // TODO: does this need to be recursive to arbitrary array
-                if (Array.isArray(input[0])) {
-                  return input.map(function (item) {
-                    return deepStripTupleAddresses(item, tupleTypes);
-                  });
-                } else {
-                  return deepStripTupleAddresses(input, tupleTypes);
-                }
+                return deepStripTupleAddresses(input, tupleTypes);
               }
               if (types[i] === 'address') {
                 return input.split('0x')[1];
@@ -199,6 +192,13 @@ var InputDataDecoder = function () {
 
 
 function deepStripTupleAddresses(input, tupleTypes) {
+  // check for deeper nested tuples recursively
+  if (Array.isArray(input[0])) {
+    return input.map(function (item) {
+      return deepStripTupleAddresses(item, tupleTypes);
+    });
+  }
+
   return input.map(function (item, i) {
     var type = tupleTypes[i].type;
     if (type === 'address' && typeof item === 'string') {

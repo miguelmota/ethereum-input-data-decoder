@@ -115,14 +115,7 @@ class InputDataDecoder {
           inputs = inputs.map((input, i) => {
             if (types[i].components) {
               const tupleTypes = types[i].components
-              // TODO: does this need to be recursive to arbitrary array
-              if (Array.isArray(input[0])) {
-                return input.map(function (item) {
-                  return deepStripTupleAddresses(item, tupleTypes);
-                })
-              } else {
-                return deepStripTupleAddresses(input, tupleTypes);
-              }
+              return deepStripTupleAddresses(input, tupleTypes)
             }
             if (types[i] === 'address') {
               return input.split('0x')[1]
@@ -171,6 +164,13 @@ class InputDataDecoder {
 
 // remove 0x from addresses
 function deepStripTupleAddresses (input, tupleTypes) {
+  // check for deeper nested tuples recursively
+  if (Array.isArray(input[0])) {
+    return input.map(function (item) {
+      return deepStripTupleAddresses(item, tupleTypes)
+    })
+  }
+
   return input.map((item, i) => {
     const type = tupleTypes[i].type
     if (type === 'address' && typeof item === 'string') {
