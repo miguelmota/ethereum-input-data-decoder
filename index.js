@@ -71,14 +71,21 @@ class InputDataDecoder {
     if (typeof data !== 'string') {
       data = ''
     }
-
     data = data.trim()
 
     const dataBuf = Buffer.from(data.replace(/^0x/, ''), 'hex')
     const methodId = toHexString(dataBuf.subarray(0, 4))
     var inputsBuf = dataBuf.subarray(4)
 
+    // console.log(methodId)
+    // console.log(inputsBuf.toString('hex'))
+
     const result = this.abi.reduce((acc, obj) => {
+      // console.log('acc')
+      // console.log(acc)
+      // console.log('obj')
+      // console.log(obj)
+
       if (obj.type === 'constructor') return acc
       if (obj.type === 'event') return acc
       const method = obj.name || null
@@ -164,20 +171,19 @@ class InputDataDecoder {
 
 // remove 0x from addresses
 function deepStripTupleAddresses (input, tupleTypes) {
-  // check for deeper nested tuples recursively
-  if (Array.isArray(input[0])) {
-    return input.map(function (item) {
-      return deepStripTupleAddresses(item, tupleTypes)
-    })
-  }
 
   return input.map((item, i) => {
-    const type = tupleTypes[i].type
+    const type = tupleTypes[i] ? tupleTypes[i].type : tupleTypes
+
     if (type === 'address' && typeof item === 'string') {
       return item.split('0x')[1]
     }
     if (type === 'address[]' || Array.isArray()) {
       return item.map(a => a.split('0x')[1])
+    }
+
+    if (Array.isArray(item)) {
+      return deepStripTupleAddresses(item, tupleTypes) 
     }
     return item
   })
