@@ -88,6 +88,7 @@ var InputDataDecoder = function () {
       if (typeof data !== 'string') {
         data = '';
       }
+
       data = data.trim();
 
       var dataBuf = Buffer.from(data.replace(/^0x/, ''), 'hex');
@@ -192,6 +193,7 @@ var InputDataDecoder = function () {
 
 function deepStripTupleAddresses(input, tupleTypes) {
   return input.map(function (item, i) {
+    // We find tupleTypes to not be an array where internalType is present in the ABI indicating item is a structure
     var type = tupleTypes[i] ? tupleTypes[i].type : tupleTypes;
 
     if (type === 'address' && typeof item === 'string') {

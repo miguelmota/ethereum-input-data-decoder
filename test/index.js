@@ -284,7 +284,7 @@ test('decoder', t => {
 
   // We found different behaviour for when WETH is used internally, so make sure to test for both cases
   // - Alexander @ Blocknative
-  t.test('1inch swap tests, (common tuple[] usage)', t => {
+  t.test('1inch swap tests, (common tuple[] usage with internalType)', t => {
     t.plan(6)
     const decoder = new InputDataDecoder(`${__dirname}/data/1inch_exchange_v2_abi.json`)
 
