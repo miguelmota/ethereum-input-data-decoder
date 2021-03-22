@@ -77,15 +77,7 @@ class InputDataDecoder {
     const methodId = toHexString(dataBuf.subarray(0, 4))
     var inputsBuf = dataBuf.subarray(4)
 
-    // console.log(methodId)
-    // console.log(inputsBuf.toString('hex'))
-
     const result = this.abi.reduce((acc, obj) => {
-      // console.log('acc')
-      // console.log(acc)
-      // console.log('obj')
-      // console.log(obj)
-
       if (obj.type === 'constructor') return acc
       if (obj.type === 'event') return acc
       const method = obj.name || null
