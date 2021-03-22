@@ -171,7 +171,6 @@ class InputDataDecoder {
 
 // remove 0x from addresses
 function deepStripTupleAddresses (input, tupleTypes) {
-
   return input.map((item, i) => {
     const type = tupleTypes[i] ? tupleTypes[i].type : tupleTypes
 
@@ -183,7 +182,7 @@ function deepStripTupleAddresses (input, tupleTypes) {
     }
 
     if (Array.isArray(item)) {
-      return deepStripTupleAddresses(item, tupleTypes) 
+      return deepStripTupleAddresses(item, tupleTypes)
     }
     return item
   })
