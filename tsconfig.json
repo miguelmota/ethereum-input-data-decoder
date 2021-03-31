@@ -22,5 +22,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "baseUrl": ".",
+    "declarationMap": true
   }
 }

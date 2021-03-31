@@ -3,6 +3,7 @@
   "version": "0.3.1",
   "description": "Ethereum smart contract transaction input data decoder",
   "main": "dist/index.js",
+  "types": "index.d.ts",
   "scripts": {
     "test": "tape ./test/index.js",
     "client": "browserify ./example/main.js -o ./example/bundle.js",
