@@ -193,7 +193,9 @@ var InputDataDecoder = function () {
 
 function deepStripTupleAddresses(input, tupleTypes) {
   return input.map(function (item, i) {
-    var type = tupleTypes[i].type;
+    // We find tupleTypes to not be an array where internalType is present in the ABI indicating item is a structure
+    var type = tupleTypes[i] ? tupleTypes[i].type : null;
+
     if (type === 'address' && typeof item === 'string') {
       return item.split('0x')[1];
     }
@@ -202,6 +204,11 @@ function deepStripTupleAddresses(input, tupleTypes) {
         return a.split('0x')[1];
       });
     }
+
+    if (Array.isArray(item)) {
+      return deepStripTupleAddresses(item, tupleTypes);
+    }
+
     return item;
   });
 }
