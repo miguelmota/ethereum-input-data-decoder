@@ -165,13 +165,20 @@ class InputDataDecoder {
 // remove 0x from addresses
 function deepStripTupleAddresses (input, tupleTypes) {
   return input.map((item, i) => {
-    const type = tupleTypes[i].type
+    // We find tupleTypes to not be an array where internalType is present in the ABI indicating item is a structure
+    const type = tupleTypes[i] ? tupleTypes[i].type : null
+
     if (type === 'address' && typeof item === 'string') {
       return item.split('0x')[1]
     }
     if (type === 'address[]' || Array.isArray()) {
       return item.map(a => a.split('0x')[1])
     }
+
+    if (Array.isArray(item)) {
+      return deepStripTupleAddresses(item, tupleTypes)
+    }
+
     return item
   })
 }
