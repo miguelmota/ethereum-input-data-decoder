@@ -1,0 +1,26 @@
+{
+  "include": [
+    "dist/*"
+  ],
+  "exclude": [],
+  "compilerOptions": {
+    "lib": [
+      "es2015",
+      "dom",
+      "dom.iterable"
+    ],
+    "target": "ES2018",
+    "declaration": true,
+    "declarationDir": ".",
+    "noEmitOnError": true,
+    "noErrorTruncation": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "baseUrl": ".",
+  }
+}
