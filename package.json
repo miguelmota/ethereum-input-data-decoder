@@ -38,7 +38,7 @@
     "ethereumjs-abi": "^0.6.7",
     "ethers": "^4.0.27",
     "is-buffer": "^2.0.3",
-    "meow": "^5.0.0"
+    "meow": "^10.1.1"
   },
   "keywords": [
     "ethereum",
