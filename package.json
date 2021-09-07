@@ -33,12 +33,14 @@
     "url": "https://github.com/miguelmota/ethereum-input-data-decoder/blob/master/LICENSE"
   },
   "dependencies": {
+    "@types/node": "^16.7.13",
     "bn.js": "^4.11.8",
     "buffer": "^5.2.1",
     "ethereumjs-abi": "^0.6.7",
     "ethers": "^4.0.27",
     "is-buffer": "^2.0.3",
-    "meow": "^10.1.1"
+    "meow": "^10.1.1",
+    "web3-utils": "^1.5.2"
   },
   "keywords": [
     "ethereum",
