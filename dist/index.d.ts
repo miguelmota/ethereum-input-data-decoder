@@ -1,4 +1,5 @@
-import { AbiItem } from "web3-utils";
+import Buffer from 'buffer';
+import { Interface } from "ethers/utils";
 
 type NestedArray<T> = T | NestedArray<T>[];
 
@@ -10,7 +11,7 @@ export interface InputData {
 }
 
 export default class InputDataDecoder {
-  constructor(abi: string | AbiItem[]);
+  constructor(abi: string | Interface['abi']);
 
   decodeConstructor(data: Buffer | string): InputData;
 
