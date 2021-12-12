@@ -1,4 +1,4 @@
-import Buffer from 'buffer';
+import { Buffer } from 'buffer';
 import { Interface } from "ethers/utils";
 
 type NestedArray<T> = T | NestedArray<T>[];
