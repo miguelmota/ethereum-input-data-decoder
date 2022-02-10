@@ -607,4 +607,24 @@ test('decoder', t => {
     t.deepEqual(result.names, expectedNames)
     t.deepEqual(result.types, expectedTypes)
   })
+
+  // https://github.com/miguelmota/ethereum-input-data-decoder/issues/36
+  t.test('test abi7.json', t => {
+    t.plan(4)
+
+    const decoder = new InputDataDecoder(`${__dirname}/data/abi7.json`)
+    const data = fs.readFileSync(`${__dirname}/data/abi7_data.txt`)
+    const result = decoder.decodeData(data)
+
+    const expectedInputs = [['0xdac17f958d2ee523a2206206994597c13d831ec70001f4c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb8aa99199d1e9644b588796f3215089878440d58e0', '0x7a58b76fFD3989dDbCe7BD632fdcF79B50530A69', { 'type': 'BigNumber', 'hex': '0x60ffb75c' }, { 'type': 'BigNumber', 'hex': '0x1dcd6500' }, { 'type': 'BigNumber', 'hex': '0x1f8587609e8c5bc3bf' }]]
+    const expectedNames = [['params', ['path', 'recipient', 'deadline', 'amountIn', 'amountOutMinimum']]]
+    const expectedTypes = [ '(bytes,address,uint256,uint256,uint256)' ]
+
+    console.log(JSON.stringify(result))
+
+    t.deepEqual(result.method, 'exactInput')
+    t.deepEqual(JSON.stringify(result.inputs), JSON.stringify(expectedInputs))
+    t.deepEqual(result.names, expectedNames)
+    t.deepEqual(result.types, expectedTypes)
+  })
 })
