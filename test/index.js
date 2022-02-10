@@ -620,8 +620,6 @@ test('decoder', t => {
     const expectedNames = [['params', ['path', 'recipient', 'deadline', 'amountIn', 'amountOutMinimum']]]
     const expectedTypes = [ '(bytes,address,uint256,uint256,uint256)' ]
 
-    console.log(JSON.stringify(result))
-
     t.deepEqual(result.method, 'exactInput')
     t.deepEqual(JSON.stringify(result.inputs), JSON.stringify(expectedInputs))
     t.deepEqual(result.names, expectedNames)
