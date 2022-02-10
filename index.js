@@ -1,14 +1,16 @@
-const fs = require('fs')
-const ethabi = require('ethereumjs-abi')
 const ethers = require('ethers')
 const Buffer = require('buffer/').Buffer
 const isBuffer = require('is-buffer')
+
+// TODO: dry up and clean up
+// NOTE: this library may be deprecated in future, in favor of ethers v5 AbiCoder.
 
 class InputDataDecoder {
   constructor (prop) {
     this.abi = []
 
     if (typeof prop === `string`) {
+      const fs = require('fs')
       this.abi = JSON.parse(fs.readFileSync(prop))
     } else if (prop instanceof Object) {
       this.abi = prop
@@ -28,7 +30,7 @@ class InputDataDecoder {
 
     data = data.trim()
 
-    for (var i = 0; i < this.abi.length; i++) {
+    for (let i = 0; i < this.abi.length; i++) {
       const obj = this.abi[i]
 
       if (obj.type !== 'constructor') {
@@ -50,7 +52,8 @@ class InputDataDecoder {
         data = `0x${data}`
       }
 
-      const inputs = ethers.utils.defaultAbiCoder.decode(types, data)
+      let inputs = ethers.utils.defaultAbiCoder.decode(types, data)
+      inputs = deepRemoveUnwantedArrayProperties(inputs)
 
       return {
         method,
@@ -76,40 +79,47 @@ class InputDataDecoder {
 
     const dataBuf = Buffer.from(data.replace(/^0x/, ''), 'hex')
     const methodId = toHexString(dataBuf.subarray(0, 4))
-    var inputsBuf = dataBuf.subarray(4)
+    let inputsBuf = dataBuf.subarray(4)
 
     const result = this.abi.reduce((acc, obj) => {
-      if (obj.type === 'constructor') return acc
-      if (obj.type === 'event') return acc
-      const method = obj.name || null
-      let types = obj.inputs ? obj.inputs.map(x => {
-        if (x.type.includes('tuple')) {
-          return x
-        } else {
-          return x.type
+      try {
+        if (obj.type === 'constructor') {
+          return acc
         }
-      }) : []
-
-      let names = obj.inputs ? obj.inputs.map(x => {
-        if (x.type.includes('tuple')) {
-          return [x.name, x.components.map(a => a.name)]
-        } else {
-          return x.name
+        if (obj.type === 'event') {
+          return acc
         }
-      }) : []
+        const method = obj.name || null
+        let types = obj.inputs ? obj.inputs.map(x => {
+          if (x.type.includes('tuple')) {
+            return x
+          } else {
+            return x.type
+          }
+        }) : []
 
-      const hash = genMethodId(method, types)
+        let names = obj.inputs ? obj.inputs.map(x => {
+          if (x.type.includes('tuple')) {
+            return [x.name, x.components.map(a => a.name)]
+          } else {
+            return x.name
+          }
+        }) : []
 
-      if (hash === methodId) {
-        let inputs = []
+        const hash = genMethodId(method, types)
 
-        try {
+        if (hash === methodId) {
+          let inputs = []
+
           inputsBuf = normalizeAddresses(types, inputsBuf)
-          inputs = ethabi.rawDecode(types, inputsBuf)
-        } catch (err) {
-          inputs = ethers.utils.defaultAbiCoder.decode(types, inputsBuf)
-          // defaultAbiCoder attaches some unwanted properties to the list object
-          inputs = deepRemoveUnwantedArrayProperties(inputs)
+          try {
+            inputs = ethers.utils.defaultAbiCoder.decode(types, inputsBuf)
+          } catch (err) {
+            try {
+              const ifc = new ethers.utils.Interface([])
+              inputs = ifc.decodeFunctionData(ethers.utils.FunctionFragment.fromObject(obj), data)
+            } catch (err) {}
+          }
 
           // TODO: do this normalization into normalizeAddresses
           inputs = inputs.map((input, i) => {
@@ -125,29 +135,78 @@ class InputDataDecoder {
             }
             return input
           })
-        }
 
-        // Map any tuple types into arrays
-        const typesToReturn = types.map(t => {
-          if (t.components) {
-            const arr = t.components.reduce((acc, cur) => [...acc, cur.type], [])
-            const tupleStr = `(${arr.join(',')})`
-            if (t.type === 'tuple[]') return tupleStr + '[]'
-            return tupleStr
+          // Map any tuple types into arrays
+          const typesToReturn = types.map(t => {
+            if (t.components) {
+              const arr = t.components.reduce((acc, cur) => [...acc, cur.type], [])
+              const tupleStr = `(${arr.join(',')})`
+              if (t.type === 'tuple[]') return tupleStr + '[]'
+              return tupleStr
+            }
+            return t
+          })
+
+          // defaultAbiCoder attaches some unwanted properties to the list object
+          inputs = deepRemoveUnwantedArrayProperties(inputs)
+
+          return {
+            method,
+            types: typesToReturn,
+            inputs,
+            names
           }
-          return t
-        })
-
-        return {
-          method,
-          types: typesToReturn,
-          inputs,
-          names
         }
-      }
 
-      return acc
+        return acc
+      } catch (err) {
+        return acc
+      }
     }, { method: null, types: [], inputs: [], names: [] })
+
+    if (!result.method) {
+      this.abi.reduce((acc, obj) => {
+        if (obj.type === 'constructor') {
+          return acc
+        }
+        if (obj.type === 'event') {
+          return acc
+        }
+        const method = obj.name || null
+
+        try {
+          const ifc = new ethers.utils.Interface([])
+          const _result = ifc.decodeFunctionData(ethers.utils.FunctionFragment.fromObject(obj), data)
+          let inputs = deepRemoveUnwantedArrayProperties(_result)
+          result.method = method
+          result.inputs = inputs
+          result.names = obj.inputs ? obj.inputs.map(x => {
+            if (x.type.includes('tuple')) {
+              return [x.name, x.components.map(a => a.name)]
+            } else {
+              return x.name
+            }
+          }) : []
+          const types = obj.inputs ? obj.inputs.map(x => {
+            if (x.type.includes('tuple')) {
+              return x
+            } else {
+              return x.type
+            }
+          }) : []
+
+          result.types = types.map(t => {
+            if (t.components) {
+              const arr = t.components.reduce((acc, cur) => [...acc, cur.type], [])
+              const tupleStr = `(${arr.join(',')})`
+              if (t.type === 'tuple[]') return tupleStr + '[]'
+              return tupleStr
+            }
+            return t
+          })
+        } catch (err) {}
+      })
+    }
 
     if (!result.method) {
       try {

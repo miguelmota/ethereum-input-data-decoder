@@ -36,8 +36,7 @@
     "@types/node": "^16.7.13",
     "bn.js": "^4.11.8",
     "buffer": "^5.2.1",
-    "ethereumjs-abi": "^0.6.7",
-    "ethers": "^4.0.27",
+    "ethers": "^5.5.4",
     "is-buffer": "^2.0.3",
     "meow": "^10.1.1"
   },

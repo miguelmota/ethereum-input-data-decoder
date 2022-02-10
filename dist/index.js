@@ -6,11 +6,12 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var fs = require('fs');
-var ethabi = require('ethereumjs-abi');
 var ethers = require('ethers');
 var Buffer = require('buffer/').Buffer;
 var isBuffer = require('is-buffer');
+
+// TODO: dry up and clean up
+// NOTE: this library may be deprecated in future, in favor of ethers v5 AbiCoder.
 
 var InputDataDecoder = function () {
   function InputDataDecoder(prop) {
@@ -19,6 +20,7 @@ var InputDataDecoder = function () {
     this.abi = [];
 
     if (typeof prop === 'string') {
+      var fs = require('fs');
       this.abi = JSON.parse(fs.readFileSync(prop));
     } else if (prop instanceof Object) {
       this.abi = prop;
@@ -67,6 +69,7 @@ var InputDataDecoder = function () {
         }
 
         var inputs = ethers.utils.defaultAbiCoder.decode(types, data);
+        inputs = deepRemoveUnwantedArrayProperties(inputs);
 
         return {
           method: method,
@@ -96,39 +99,46 @@ var InputDataDecoder = function () {
       var inputsBuf = dataBuf.subarray(4);
 
       var result = this.abi.reduce(function (acc, obj) {
-        if (obj.type === 'constructor') return acc;
-        if (obj.type === 'event') return acc;
-        var method = obj.name || null;
-        var types = obj.inputs ? obj.inputs.map(function (x) {
-          if (x.type.includes('tuple')) {
-            return x;
-          } else {
-            return x.type;
+        try {
+          if (obj.type === 'constructor') {
+            return acc;
           }
-        }) : [];
-
-        var names = obj.inputs ? obj.inputs.map(function (x) {
-          if (x.type.includes('tuple')) {
-            return [x.name, x.components.map(function (a) {
-              return a.name;
-            })];
-          } else {
-            return x.name;
+          if (obj.type === 'event') {
+            return acc;
           }
-        }) : [];
+          var method = obj.name || null;
+          var types = obj.inputs ? obj.inputs.map(function (x) {
+            if (x.type.includes('tuple')) {
+              return x;
+            } else {
+              return x.type;
+            }
+          }) : [];
 
-        var hash = genMethodId(method, types);
+          var names = obj.inputs ? obj.inputs.map(function (x) {
+            if (x.type.includes('tuple')) {
+              return [x.name, x.components.map(function (a) {
+                return a.name;
+              })];
+            } else {
+              return x.name;
+            }
+          }) : [];
 
-        if (hash === methodId) {
-          var inputs = [];
+          var hash = genMethodId(method, types);
 
-          try {
+          if (hash === methodId) {
+            var inputs = [];
+
             inputsBuf = normalizeAddresses(types, inputsBuf);
-            inputs = ethabi.rawDecode(types, inputsBuf);
-          } catch (err) {
-            inputs = ethers.utils.defaultAbiCoder.decode(types, inputsBuf);
-            // defaultAbiCoder attaches some unwanted properties to the list object
-            inputs = deepRemoveUnwantedArrayProperties(inputs);
+            try {
+              inputs = ethers.utils.defaultAbiCoder.decode(types, inputsBuf);
+            } catch (err) {
+              try {
+                var ifc = new ethers.utils.Interface([]);
+                inputs = ifc.decodeFunctionData(ethers.utils.FunctionFragment.fromObject(obj), data);
+              } catch (err) {}
+            }
 
             // TODO: do this normalization into normalizeAddresses
             inputs = inputs.map(function (input, i) {
@@ -146,31 +156,84 @@ var InputDataDecoder = function () {
               }
               return input;
             });
+
+            // Map any tuple types into arrays
+            var typesToReturn = types.map(function (t) {
+              if (t.components) {
+                var arr = t.components.reduce(function (acc, cur) {
+                  return [].concat(_toConsumableArray(acc), [cur.type]);
+                }, []);
+                var tupleStr = '(' + arr.join(',') + ')';
+                if (t.type === 'tuple[]') return tupleStr + '[]';
+                return tupleStr;
+              }
+              return t;
+            });
+
+            // defaultAbiCoder attaches some unwanted properties to the list object
+            inputs = deepRemoveUnwantedArrayProperties(inputs);
+
+            return {
+              method: method,
+              types: typesToReturn,
+              inputs: inputs,
+              names: names
+            };
           }
 
-          // Map any tuple types into arrays
-          var typesToReturn = types.map(function (t) {
-            if (t.components) {
-              var arr = t.components.reduce(function (acc, cur) {
-                return [].concat(_toConsumableArray(acc), [cur.type]);
-              }, []);
-              var tupleStr = '(' + arr.join(',') + ')';
-              if (t.type === 'tuple[]') return tupleStr + '[]';
-              return tupleStr;
-            }
-            return t;
-          });
-
-          return {
-            method: method,
-            types: typesToReturn,
-            inputs: inputs,
-            names: names
-          };
+          return acc;
+        } catch (err) {
+          return acc;
         }
-
-        return acc;
       }, { method: null, types: [], inputs: [], names: [] });
+
+      if (!result.method) {
+        this.abi.reduce(function (acc, obj) {
+          if (obj.type === 'constructor') {
+            return acc;
+          }
+          if (obj.type === 'event') {
+            return acc;
+          }
+          var method = obj.name || null;
+
+          try {
+            var ifc = new ethers.utils.Interface([]);
+            var _result = ifc.decodeFunctionData(ethers.utils.FunctionFragment.fromObject(obj), data);
+            var inputs = deepRemoveUnwantedArrayProperties(_result);
+            result.method = method;
+            result.inputs = inputs;
+            result.names = obj.inputs ? obj.inputs.map(function (x) {
+              if (x.type.includes('tuple')) {
+                return [x.name, x.components.map(function (a) {
+                  return a.name;
+                })];
+              } else {
+                return x.name;
+              }
+            }) : [];
+            var types = obj.inputs ? obj.inputs.map(function (x) {
+              if (x.type.includes('tuple')) {
+                return x;
+              } else {
+                return x.type;
+              }
+            }) : [];
+
+            result.types = types.map(function (t) {
+              if (t.components) {
+                var arr = t.components.reduce(function (acc, cur) {
+                  return [].concat(_toConsumableArray(acc), [cur.type]);
+                }, []);
+                var tupleStr = '(' + arr.join(',') + ')';
+                if (t.type === 'tuple[]') return tupleStr + '[]';
+                return tupleStr;
+              }
+              return t;
+            });
+          } catch (err) {}
+        });
+      }
 
       if (!result.method) {
         try {

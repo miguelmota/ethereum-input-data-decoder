@@ -246,6 +246,12 @@ npm test
   npm run lint
   ```
 
+5. Build:
+
+  ```bash
+  npm run build
+  ```
+
 ## Contributing
 
 Pull requests are welcome!
