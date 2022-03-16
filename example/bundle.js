@@ -48,8 +48,16 @@ class InputDataDecoder {
     this.abi = []
 
     if (typeof prop === `string`) {
-      const fs = require('fs')
-      this.abi = JSON.parse(fs.readFileSync(prop))
+      try {
+        const fs = require('fs')
+        this.abi = JSON.parse(fs.readFileSync(prop))
+      } catch (err) {
+        try {
+          this.abi = JSON.parse(prop)
+        } catch (err) {
+          throw new Error(`Invalid ABI: ${err.message}`)
+        }
+      }
     } else if (prop instanceof Object) {
       this.abi = prop
     } else {

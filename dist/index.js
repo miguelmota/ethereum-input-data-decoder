@@ -20,8 +20,16 @@ var InputDataDecoder = function () {
     this.abi = [];
 
     if (typeof prop === 'string') {
-      var fs = require('fs');
-      this.abi = JSON.parse(fs.readFileSync(prop));
+      try {
+        var fs = require('fs');
+        this.abi = JSON.parse(fs.readFileSync(prop));
+      } catch (err) {
+        try {
+          this.abi = JSON.parse(prop);
+        } catch (err) {
+          throw new Error('Invalid ABI: ' + err.message);
+        }
+      }
     } else if (prop instanceof Object) {
       this.abi = prop;
     } else {

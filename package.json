@@ -6,7 +6,7 @@
   "types": "index.d.ts",
   "scripts": {
     "test": "tape ./test/index.js",
-    "client": "browserify ./example/main.js -o ./example/bundle.js",
+    "build:example": "browserify ./example/main.js -o ./example/bundle.js",
     "build": "babel index.js --presets babel-preset-es2015 --out-dir dist/",
     "lint": "standard --fix index.js test/*.js",
     "prepare": "npm run lint && npm run build"
