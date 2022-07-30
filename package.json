@@ -1,6 +1,6 @@
 {
   "name": "ethereum-input-data-decoder",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Ethereum smart contract transaction input data decoder",
   "main": "dist/index.js",
   "types": "index.d.ts",
@@ -38,7 +38,7 @@
     "buffer": "^5.2.1",
     "ethers": "^5.5.4",
     "is-buffer": "^2.0.3",
-    "meow": "^10.1.1"
+    "meow": "9.0.0"
   },
   "keywords": [
     "ethereum",
